@@ -9,6 +9,7 @@ rust-version.workspace = true
 
 description = "High-level Rust wrappers around the Endpoint Security Framework"
 documentation = "https://docs.rs/endpoint-sec"
+readme = "../README.md"
 
 [features]
 # The default feature activates nothing to ensure developers are aware of what
