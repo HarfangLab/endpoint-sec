@@ -1,0 +1,45 @@
+[package]
+name = "endpoint-sec"
+
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+description = "High-level Rust wrappers around the Endpoint Security Framework"
+documentation = "https://docs.rs/endpoint-sec"
+
+[features]
+# The default feature activates nothing to ensure developers are aware of what
+# they use. This means this crate supports Endpoint Security from macOS 10.15.0
+# by default.
+default = []
+
+# Expose `AuditToken::from_pid()`
+audit_token_from_pid = []
+
+# Updated to the maximum version each time a new one is introduced
+max = ["macos_13_3_0"]
+
+macos_13_3_0 = ["macos_13_0_0", "endpoint-sec-sys/macos_13_3_0"]
+macos_13_0_0 = ["macos_12_0_0", "endpoint-sec-sys/macos_13_0_0"]
+macos_12_0_0 = ["macos_11_3_0", "endpoint-sec-sys/macos_12_0_0"]
+macos_11_3_0 = ["macos_11_0_0", "endpoint-sec-sys/macos_11_3_0"]
+macos_11_0_0 = ["macos_10_15_4", "endpoint-sec-sys/macos_11_0_0"]
+macos_10_15_4 = ["macos_10_15_1", "endpoint-sec-sys/macos_10_15_4"]
+macos_10_15_1 = ["endpoint-sec-sys/macos_10_15_1"]
+
+[target.'cfg(target_os = "macos")'.dependencies]
+endpoint-sec-sys.workspace = true
+mach2.workspace = true
+libc.workspace = true
+static_assertions.workspace = true
+
+[target.'cfg(target_os = "macos")'.dev-dependencies]
+sysinfo.workspace = true
+
+[package.metadata.docs.rs]
+features = ["max", "audit_token_from_pid"]
+rustdoc-args = ["--cfg", "docsrs"]
+targets = ["x86_64-apple-darwin", "aarch64-apple-darwin"]

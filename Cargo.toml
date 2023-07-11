@@ -1,0 +1,26 @@
+[workspace.package]
+version = "0.1.0"
+authors = ["HarfangLab Rust Team"]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+repository = "https://github.com/HarfangLab/endpoint-sec"
+rust-version = "1.65"
+
+[workspace]
+members = ["endpoint-sec/", "endpoint-sec-sys/"]
+resolver = "2"
+
+[workspace.dependencies]
+# In workspace
+endpoint-sec = { version = "0.1.0", path = "./endpoint-sec" }
+endpoint-sec-sys = { version = "0.1.0", path = "./endpoint-sec-sys" }
+
+# External - Required
+block2 = "=0.2.0-alpha.7"
+libc = { version = "0.2", features = ["extra_traits"] }
+mach2 = "0.4"
+objc2-encode = "=2.0.0-pre.3"
+static_assertions = "1.1"
+
+# External - For tests
+sysinfo = "0.28"

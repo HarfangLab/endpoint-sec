@@ -1,0 +1,39 @@
+[package]
+name = "endpoint-sec-sys"
+
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+description = "Raw Rust wrappers around the Endpoint Security Framework"
+documentation = "https://docs.rs/endpoint-sec-sys"
+
+[features]
+# The default feature activates nothing to ensure developers are aware of what
+# they use. This means this crate supports Endpoint Security from macOS 10.15.0
+# by default.
+default = []
+
+# Updated to the maximum version each time a new one is introduced
+max = ["macos_13_3_0"]
+
+macos_13_3_0 = ["macos_13_0_0"]
+macos_13_0_0 = ["macos_12_0_0"]
+macos_12_0_0 = ["macos_11_3_0"]
+macos_11_3_0 = ["macos_11_0_0"]
+macos_11_0_0 = ["macos_10_15_4"]
+macos_10_15_4 = ["macos_10_15_1"]
+macos_10_15_1 = []
+
+[target.'cfg(target_os = "macos")'.dependencies]
+block2.workspace = true
+libc.workspace = true
+mach2.workspace = true
+objc2-encode.workspace = true
+
+[package.metadata.docs.rs]
+features = ["max"]
+rustdoc-args = ["--cfg", "docsrs"]
+targets = ["x86_64-apple-darwin", "aarch64-apple-darwin"]

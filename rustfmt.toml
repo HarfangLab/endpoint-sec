@@ -1,0 +1,11 @@
+# Needs rustfmt-nightly
+
+edition = "2021"
+fn_call_width = 60
+format_macro_matchers = true
+group_imports = "StdExternalCrate"
+imports_granularity = "Module"
+match_block_trailing_comma = true
+max_width = 120
+overflow_delimited_expr = true
+reorder_impl_items = true
