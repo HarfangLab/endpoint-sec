@@ -2,7 +2,9 @@
 
 use std::ffi::OsStr;
 use std::ptr::NonNull;
-use std::time::{Duration, Instant, SystemTime};
+#[cfg(feature = "macos_10_15_4")]
+use std::time::Duration;
+use std::time::{Instant, SystemTime};
 
 use endpoint_sec_sys::*;
 
