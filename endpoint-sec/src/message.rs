@@ -40,7 +40,14 @@ impl Message {
     /// # Details
     ///
     /// On macOS 11.0+, with the feature `"macos_11_0_0"` (or more) active, this uses
-    /// [`es_retain_message()`], which is basically an `Arc::clone()`.
+    #[cfg_attr(
+        feature = "macos_11_0_0",
+        doc = "[`es_retain_message()`], which is basically an `Arc::clone()`."
+    )]
+    #[cfg_attr(
+        not(feature = "macos_11_0_0"),
+        doc = "`es_retain_message()`, which is basically an `Arc::clone()`."
+    )]
     ///
     /// On macOS 10.15.x, this calls [`es_copy_message()`].
     #[inline(always)]
@@ -368,7 +375,14 @@ impl<'a> Process<'a> {
 
     /// Parent pid of the process.
     ///
-    /// **Warning**: It is recommended to instead use [`Self::parent_audit_token()`] when available.
+    #[cfg_attr(
+        feature = "macos_11_0_0",
+        doc = "**Warning**: It is recommended to instead use [`Self::parent_audit_token()`] when available."
+    )]
+    #[cfg_attr(
+        not(feature = "macos_11_0_0"),
+        doc = "**Warning**: It is recommended to instead use `Self::parent_audit_token()` when available."
+    )]
     #[inline(always)]
     pub fn ppid(&self) -> pid_t {
         self.raw.ppid

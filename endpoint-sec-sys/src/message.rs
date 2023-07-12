@@ -259,7 +259,9 @@ pub struct es_btm_launch_item_t {
 ///
 /// Process arguments, environment variables and file descriptors are packed, use API functions
 /// to access them: [`es_exec_arg()`], [`es_exec_arg_count()`], [`es_exec_env()`],
-/// [`es_exec_env_count()`], [`es_exec_fd()`] and [`es_exec_fd_count()`].
+/// [`es_exec_env_count()`],
+#[cfg_attr(feature = "macos_11_0_0", doc = "[`es_exec_fd()`] and [`es_exec_fd_count()`].")]
+#[cfg_attr(not(feature = "macos_11_0_0"), doc = "`es_exec_fd()` and `es_exec_fd_count()`.")]
 ///
 /// The API may only return descriptions for a subset of open file descriptors; how many and
 /// which file descriptors are available as part of exec events is not considered API and can change
@@ -2362,7 +2364,15 @@ extern "C" {
     /// (e.g. by using the reported size in order to `malloc(3)` a buffer, and `memcpy(3)` an
     /// existing `es_message_t` into that buffer). Doing so will result in use-after-free bugs.
     ///
-    /// **Deprecated in macOS 11+*: Please use [`es_retain_message()`] to retain an `es_message_t`.
+    ///
+    #[cfg_attr(
+        feature = "macos_11_0_0",
+        doc = "**Deprecated in macOS 11+**: Please use [`es_retain_message()`] to retain an `es_message_t`."
+    )]
+    #[cfg_attr(
+        not(feature = "macos_11_0_0"),
+        doc = "**Deprecated in macOS 11+**: Please use `es_retain_message()` to retain an `es_message_t`."
+    )]
     ///
     /// - `msg`: The message for which the size will be calculated
     /// - Returns the size of the message
@@ -2374,7 +2384,14 @@ extern "C" {
     /// It is invalid to attempt to write to the returned `es_message_t`, despite being non-`const`,
     /// and doing so will result in a crash.
     ///
-    /// **Deprecated in macOS 11+*: Please use [`es_retain_message()`] to retain an `es_message_t`.
+    #[cfg_attr(
+        feature = "macos_11_0_0",
+        doc = "**Deprecated in macOS 11+**: Please use [`es_retain_message()`] to retain an `es_message_t`."
+    )]
+    #[cfg_attr(
+        not(feature = "macos_11_0_0"),
+        doc = "**Deprecated in macOS 11+**: Please use `es_retain_message()` to retain an `es_message_t`."
+    )]
     ///
     /// - `msg`: The message to be retained
     /// - Returns a non-const pointer to the retained `es_message_t`
@@ -2385,8 +2402,14 @@ extern "C" {
     /// Releases the memory associated with the given [`es_message_t`] that was retained via
     /// [`es_copy_message()`]
     ///
-    /// **Deprecated in macOS 11+*: Please use [`es_release_message()`] to release an
-    /// `es_message_t`.
+    #[cfg_attr(
+        feature = "macos_11_0_0",
+        doc = "**Deprecated in macOS 11+**: Please use [`es_retain_message()`] to retain an `es_message_t`."
+    )]
+    #[cfg_attr(
+        not(feature = "macos_11_0_0"),
+        doc = "**Deprecated in macOS 11+**: Please use `es_retain_message()` to retain an `es_message_t`."
+    )]
     ///
     /// - `msg`: The message to be released
     pub fn es_free_message(msg: &es_message_t);

@@ -366,16 +366,31 @@ impl Client {
 
     /// Mute a path for all event types.
     ///
-    /// See [`es_mute_path`].
+    #[cfg_attr(feature = "macos_12_0_0", doc = "See [`es_mute_path`].")]
+    #[cfg_attr(not(feature = "macos_12_0_0"), doc = "See `es_mute_path`.")]
     ///
     /// # Note
     ///
     /// The C function takes a `const char * _Nonnull path`, which means it expects a nul-
     /// terminated string. Since the functions to gather such paths give [`OsString`]s (ex:
-    /// [`Self::muted_paths_events`]), this method will truncate the given `path` to the first `\0`
+    #[cfg_attr(
+        feature = "macos_12_0_0",
+        doc = "[`Self::muted_paths_events`]), this method will truncate the given `path` to the first `\0`"
+    )]
+    #[cfg_attr(
+        not(feature = "macos_12_0_0"),
+        doc = "`Self::muted_paths_events`), this method will truncate the given `path` to the first `\0`"
+    )]
     /// if it has one or add it itself if it does not (in which case there will be an allocation).
     ///
-    /// - If called on macOS 12.0+: uses [`es_mute_path()`].
+    #[cfg_attr(
+        feature = "macos_12_0_0",
+        doc = "- If called on macOS 12.0+: uses [`es_mute_path()`]."
+    )]
+    #[cfg_attr(
+        not(feature = "macos_12_0_0"),
+        doc = "- If called on macOS 12.0+: uses `es_mute_path()`."
+    )]
     /// - If called on macOS 10.15 or 11: uses [`es_mute_path_prefix()`] and [`es_mute_path_literal()`] accordingly.
     #[doc(alias = "es_mute_path")]
     #[doc(alias = "es_mute_path_prefix")]
