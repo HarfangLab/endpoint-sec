@@ -10,7 +10,7 @@ pub use block2;
 use block2::Block;
 use libc::c_char;
 pub use libc::c_void;
-use objc2_encode::{Encoding, RefEncode};
+use objc2::{Encoding, RefEncode};
 
 use super::{
     audit_token_t, es_auth_result_t, es_clear_cache_result_t, es_event_type_t, es_message_t, es_new_client_result_t,

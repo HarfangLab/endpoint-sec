@@ -13,7 +13,7 @@ pub use std::os::raw::c_int;
 #[cfg(feature = "macos_13_0_0")]
 pub use libc::{cpu_subtype_t, cpu_type_t};
 pub use libc::{dev_t, gid_t, mode_t, pid_t, stat, statfs, timespec, timeval, uid_t};
-use objc2_encode::{Encoding, RefEncode};
+use objc2::{Encoding, RefEncode};
 
 #[cfg(feature = "macos_10_15_4")]
 use super::es_proc_check_type_t;
