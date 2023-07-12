@@ -10,21 +10,21 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "block-sys"
-version = "0.1.0-beta.2"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0a27d75e09d3d1a1b72c2583aaec59db16932ea927846036b24b968d8240c08"
+checksum = "2dd7cf50912cddc06dc5ea7c08c5e81c1b2c842a70d19def1848d54c586fed92"
 dependencies = [
  "objc-sys",
 ]
 
 [[package]]
 name = "block2"
-version = "0.2.0-alpha.7"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "344b33cc92d2c0816f45d61b2dca4a30fb8c84e395a4323397f0965f16f990e1"
+checksum = "52bb065b1ae91eaf6774e57c0e437f93b3111bac2d6011e517c72df84323e0a5"
 dependencies = [
  "block-sys",
- "objc2-encode",
+ "objc2",
 ]
 
 [[package]]
@@ -106,7 +106,7 @@ dependencies = [
  "block2",
  "libc",
  "mach2",
- "objc2-encode",
+ "objc2",
 ]
 
 [[package]]
@@ -163,18 +163,25 @@ dependencies = [
 
 [[package]]
 name = "objc-sys"
-version = "0.2.0-beta.3"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0925b3332d2aaa3a78b65b065cf68ab0e1d7527d5f7fe48c7613ce166f1494a"
+checksum = "99e1d07c6eab1ce8b6382b8e3c7246fe117ff3f8b34be065f5ebace6749fe845"
+
+[[package]]
+name = "objc2"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3cf6c364d54fa7b8be594c17b1506d5fe332038d3f6ef7b4ce36a5788798634c"
+dependencies = [
+ "objc-sys",
+ "objc2-encode",
+]
 
 [[package]]
 name = "objc2-encode"
-version = "2.0.0-pre.3"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2612e4d4049c415e4a5de45c1d000df1bcf4782167716db14c3d5d54285da846"
-dependencies = [
- "objc-sys",
-]
+checksum = "de517cb1d179b07c6c59fb4ce60f7511eba229a2488472bb41f00344d22a091e"
 
 [[package]]
 name = "once_cell"

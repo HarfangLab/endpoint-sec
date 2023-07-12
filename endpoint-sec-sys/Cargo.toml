@@ -32,7 +32,7 @@ macos_10_15_1 = []
 block2.workspace = true
 libc.workspace = true
 mach2.workspace = true
-objc2-encode.workspace = true
+objc2.workspace = true
 
 [package.metadata.docs.rs]
 features = ["max"]
