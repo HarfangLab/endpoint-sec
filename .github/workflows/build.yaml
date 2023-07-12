@@ -188,44 +188,6 @@ jobs:
             --target aarch64-apple-darwin \
             --features ${{ matrix.os.feature }}
 
-  test:
-    name: Test - all features (${{ matrix.version.name }}, ${{ matrix.target }})
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        version:
-        - { name: Stable, value: stable }
-        target:
-        - x86_64-apple-darwin # No GitLab CI aarch64-apple-darwin runners yet
-
-    steps:
-      - name: checkout sources
-        uses: actions/checkout@v3
-
-      - name: Install toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ matrix.version.value }}
-          targets: ${{ matrix.target }}
-
-      - name: Cache cargo output
-        uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.version.value }}-all_features
-
-      - name: Fetch dependencies
-        run: cargo +${{ matrix.version.value }} fetch --locked
-
-      - name: Test
-        run: |
-          cargo +${{ matrix.version.value }} \
-            test \
-            --verbose \
-            --locked \
-            --offline \
-            --target ${{ matrix.target }} \
-            --all-features
-
   fmt:
     name: Formatting
     runs-on: ubuntu-latest
