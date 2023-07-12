@@ -5,6 +5,7 @@ version.workspace = true
 authors.workspace = true
 license.workspace = true
 edition.workspace = true
+repository.workspace = true
 rust-version.workspace = true
 
 description = "Raw Rust wrappers around the Endpoint Security Framework"
