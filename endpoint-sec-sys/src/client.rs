@@ -132,7 +132,8 @@ extern "C" {
     /// - `client`: The client for which events will be suppressed
     /// - `audit_token`: The audit token of the process for which events will be suppressed
     ///
-    /// See [`es_mute_process_events()`]
+    #[cfg_attr(feature = "macos_12_0_0", doc = "See [`es_mute_process_events()`]")]
+    #[cfg_attr(not(feature = "macos_12_0_0"), doc = "See `es_mute_process_events()`")]
     pub fn es_mute_process(client: *mut es_client_t, audit_token: *const audit_token_t) -> es_return_t;
 
     /// Suppress a subset of events from the process described by the given `audit_token`
@@ -156,7 +157,8 @@ extern "C" {
     /// - `client`: The client for which the process will be unmuted
     /// - `audit_token`: The audit token of the process to be unmuted
     ///
-    /// See [`es_unmute_process_events()`]
+    #[cfg_attr(feature = "macos_12_0_0", doc = "See [`es_unmute_process_events()`]")]
+    #[cfg_attr(not(feature = "macos_12_0_0"), doc = "See `es_unmute_process_events()`")]
     pub fn es_unmute_process(client: *mut es_client_t, audit_token: *const audit_token_t) -> es_return_t;
 
     /// Unmute a process for a subset of event types.
@@ -363,7 +365,14 @@ extern "C" {
 
     /// Suppress events matching a path prefix
     ///
-    /// **Deprecated in macOS 11**: Please use [`es_mute_path()`] or [`es_mute_path_events()`]
+    #[cfg_attr(
+        feature = "macos_12_0_0",
+        doc = "**Deprecated in macOS 12**: Please use [`es_mute_path()`] or [`es_mute_path_events()`]"
+    )]
+    #[cfg_attr(
+        not(feature = "macos_12_0_0"),
+        doc = "**Deprecated in macOS 12**: Please use `es_mute_path()` or `es_mute_path_events()`"
+    )]
     ///
     /// - `client`: The client for which events will be suppressed
     /// - `path_prefix`: The path against which supressed executables must prefix match
@@ -371,20 +380,40 @@ extern "C" {
 
     /// Suppress events matching a path literal
     ///
-    /// **Deprecated in macOS 11**: Please use [`es_mute_path()`] or [`es_mute_path_events()`]
+    #[cfg_attr(
+        feature = "macos_12_0_0",
+        doc = "**Deprecated in macOS 12**: Please use [`es_mute_path()`] or [`es_mute_path_events()`]"
+    )]
+    #[cfg_attr(
+        not(feature = "macos_12_0_0"),
+        doc = "**Deprecated in macOS 12**: Please use `es_mute_path()` or `es_mute_path_events()`"
+    )]
     ///
     /// - `client`: The client for which events will be suppressed
     /// - `path_literal`: The path against which supressed executables must match exactly
     ///
-    /// See [`es_mute_path()`]
-    /// See [`es_mute_path_events()`]
+    #[cfg_attr(
+        feature = "macos_12_0_0",
+        doc = "See [`es_mute_path()`] and [`es_mute_path_events()`]"
+    )]
+    #[cfg_attr(
+        not(feature = "macos_12_0_0"),
+        doc = "See `es_mute_path()` and `es_mute_path_events()`"
+    )]
     pub fn es_mute_path_literal(client: *mut es_client_t, path_literal: *const c_char) -> es_return_t;
 
     /// Unmute all paths
     ///
     /// - `client`: The client for which all currently muted paths will be unmuted
     ///
-    /// Only unmutes **executable** paths. To unmute target paths see [`es_unmute_all_target_paths()`].
+    #[cfg_attr(
+        feature = "macos_13_0_0",
+        doc = "Only unmutes **executable** paths. To unmute target paths see [`es_unmute_all_target_paths()`]."
+    )]
+    #[cfg_attr(
+        not(feature = "macos_13_0_0"),
+        doc = "Only unmutes **executable** paths. To unmute target paths see `es_unmute_all_target_paths()`."
+    )]
     pub fn es_unmute_all_paths(client: *mut es_client_t) -> es_return_t;
 
     /// Unmute all target paths
@@ -624,12 +653,19 @@ extern "C" {
     /// See also:
     ///
     /// - [`es_retain_message()`][erm]
-    /// - [`es_release_message()`][super::es_release_message]
+    #[cfg_attr(feature = "macos_11_0_0", doc = "- [`es_release_message()`]")]
+    #[cfg_attr(not(feature = "macos_11_0_0"), doc = "- `es_release_message()`")]
     /// - [`es_new_client_result_t`]
-    /// - [`es_muted_paths_events()`]
-    /// - [`es_unmute_path_events()`]
+    #[cfg_attr(
+        feature = "macos_12_0_0",
+        doc = "- [`es_muted_paths_events()`]\n- [`es_unmute_path_events()`]"
+    )]
+    #[cfg_attr(
+        not(feature = "macos_12_0_0"),
+        doc = "- `es_muted_paths_events()`\n- `es_unmute_path_events()`"
+    )]
     ///
-    /// [erm]: super::es_retain_message
+    /// [erm]: [es_retain_message]
     /// [not-perm]: crate::es_new_client_result_t::ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED
     #[allow(improper_ctypes)]
     // In this specific case, it is okay because the block is called as
