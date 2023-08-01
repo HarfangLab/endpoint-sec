@@ -19,7 +19,7 @@ endpoint-sec-sys = { version = "0.2.0", path = "./endpoint-sec-sys" }
 block2 = "0.2.0"
 libc = { version = "0.2", features = ["extra_traits"] }
 mach2 = "0.4"
-objc2 = "0.4.0"
+objc2 = "0.4.1"
 static_assertions = "1.1"
 
 # External - For tests
