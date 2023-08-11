@@ -43,5 +43,5 @@ sysinfo.workspace = true
 
 [package.metadata.docs.rs]
 features = ["max", "audit_token_from_pid"]
-rustdoc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs", "--generate-link-to-definition"]
 targets = ["x86_64-apple-darwin", "aarch64-apple-darwin"]
