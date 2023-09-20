@@ -56,7 +56,7 @@ pub struct ShouldNotBeNull<T: ?Sized>(*mut T);
 impl<T: ?Sized> Clone for ShouldNotBeNull<T> {
     #[inline]
     fn clone(&self) -> Self {
-        Self(self.0)
+        *self
     }
 }
 
