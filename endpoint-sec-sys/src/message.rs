@@ -60,7 +60,15 @@ pub struct es_thread_t {
 /// for exec events this describes the new process being executed, for signal events this describes
 /// the process that will receive the signal).
 ///
-/// Values such as PID, UID, GID, etc. can be extracted from audit tokens via API in `libbsm.h`.
+/// Values such as `pid`, `pidversion`, `uid`, `gid`, etc. can be extracted from audit tokens using
+/// API provided in `libbsm.h`.
+///
+/// ### Identifying unique process execution on a single machine
+///
+/// The tuple `(pid, pidversion)` identifies a specific process execution, and should be used to
+/// link events to the process that emitted them. Executing an executable image in a process using
+/// the `exec` or `posix_spawn` family of syscalls increments the `pidversion`. However, `(pid,
+/// pidversion)` is not meant to be unique across reboots or across multiple systems.
 ///
 /// ### Multiple ES clients
 ///
@@ -123,7 +131,9 @@ pub struct es_process_t {
     /// **Non**-nullable
     pub executable: ShouldNotBeNull<es_file_t>,
     /// The TTY this process is associated with, or NULL if the process does not have an associated
-    /// TTY.
+    /// TTY. The TTY is a property of the POSIX session the process belongs to. A process' session
+    /// may be associated with a TTY independently from whether its stdin or any other file
+    /// descriptors point to a TTY device (as per `isatty(3)`, `tty(1)`).
     ///
     /// Field available only if message version >= 2.
     #[cfg(feature = "macos_10_15_1")]
