@@ -19,8 +19,9 @@ readme = "../README.md"
 default = []
 
 # Updated to the maximum version each time a new one is introduced
-max = ["macos_13_3_0"]
+max = ["macos_14_0_0"]
 
+macos_14_0_0 = ["macos_13_3_0"]
 macos_13_3_0 = ["macos_13_0_0"]
 macos_13_0_0 = ["macos_12_0_0"]
 macos_12_0_0 = ["macos_11_3_0"]
