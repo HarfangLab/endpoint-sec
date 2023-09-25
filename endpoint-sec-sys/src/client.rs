@@ -250,7 +250,7 @@ extern "C" {
     /// - [`OPEN`][crate::es_event_open_t]:
     ///        The file being opened
     /// - [`MMAP`][crate::es_event_mmap_t]:
-    ///        The file being memeory mapped
+    ///        The file being memory mapped
     /// - [`RENAME`][crate::es_event_rename_t]:
     ///        Both the source and destination path.
     /// - [`SIGNAL`][crate::es_event_signal_t]:
@@ -305,7 +305,7 @@ extern "C" {
     /// - [`READDIR`][crate::es_event_readdir_t]:
     ///        The directory for whose contents will be read
     /// - [`DELETEEXTATTR`][crate::es_event_deleteextattr_t]:
-    ///        The file for which extended attribtes will be deleted
+    ///        The file for which extended attributes will be deleted
     /// - [`DUP`][crate::es_event_dup_t]:
     ///        The file being duplicated
     /// - [`UIPC_BIND`][crate::es_event_uipc_bind_t]:
@@ -317,7 +317,7 @@ extern "C" {
     /// - [`SETACL`][crate::es_event_setacl_t]:
     ///        The file for which ACLs are being set
     /// - [`PROC_CHECK`][crate::es_event_proc_check_t]:
-    ///        The path of the process against which access is beign checked
+    ///        The path of the process against which access is being checked
     /// - [`SEARCHFS`][crate::es_event_searchfs_t]:
     ///        The path of the volume which will be searched
     /// - [`PROC_SUSPEND_RESUME`][crate::es_event_proc_suspend_resume_t]:
@@ -375,7 +375,7 @@ extern "C" {
     )]
     ///
     /// - `client`: The client for which events will be suppressed
-    /// - `path_prefix`: The path against which supressed executables must prefix match
+    /// - `path_prefix`: The path against which suppressed executables must prefix match
     pub fn es_mute_path_prefix(client: *mut es_client_t, path_prefix: *const c_char) -> es_return_t;
 
     /// Suppress events matching a path literal
@@ -390,7 +390,7 @@ extern "C" {
     )]
     ///
     /// - `client`: The client for which events will be suppressed
-    /// - `path_literal`: The path against which supressed executables must match exactly
+    /// - `path_literal`: The path against which suppressed executables must match exactly
     ///
     #[cfg_attr(
         feature = "macos_12_0_0",
@@ -430,7 +430,7 @@ extern "C" {
     /// - `path`: The path to unmute.
     /// - `type`: Describes the type of the `path` parameter, either a prefix path or literal path.
     ///
-    /// Muting and unuting operations logically work on a set of `(path_type, path,
+    /// Muting and unmuting operations logically work on a set of `(path_type, path,
     /// es_event_type_t)` tuples Subtracting an element from the set that is not present has no
     /// effect For example if `(literal, /foo/bar/, *)` is muted Then `(prefix, /foo, *)` is unmuted
     /// the mute set is still: `(literal, /foo/bar, *)`. Prefixes only apply to mute evaluation not
@@ -677,7 +677,7 @@ extern "C" {
     /// - `client`: The client to be destroyed
     ///
     /// - `ES_RETURN_SUCCESS` indicates all resources were freed.
-    /// - `ES_RETURN_ERROR` indicates an error occured during shutdown and resources were leaked.
+    /// - `ES_RETURN_ERROR` indicates an error occurred during shutdown and resources were leaked.
     ///
     /// Must be called from the same thread that originally called [`es_new_client()`].
     pub fn es_delete_client(client: *mut es_client_t) -> es_return_t;
