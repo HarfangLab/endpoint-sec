@@ -653,7 +653,7 @@ extern "C" {
     /// See also:
     ///
     /// - [`es_retain_message()`][erm]
-    #[cfg_attr(feature = "macos_11_0_0", doc = "- [`es_release_message()`]")]
+    #[cfg_attr(feature = "macos_11_0_0", doc = "- [`es_release_message()`][rls]")]
     #[cfg_attr(not(feature = "macos_11_0_0"), doc = "- `es_release_message()`")]
     /// - [`es_new_client_result_t`]
     #[cfg_attr(
@@ -665,7 +665,8 @@ extern "C" {
         doc = "- `es_muted_paths_events()`\n- `es_unmute_path_events()`"
     )]
     ///
-    /// [erm]: [es_retain_message]
+    /// [erm]: crate::es_retain_message
+    /// [rls]: crate::es_release_message
     /// [not-perm]: crate::es_new_client_result_t::ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED
     #[allow(improper_ctypes)]
     // In this specific case, it is okay because the block is called as
