@@ -33,10 +33,14 @@
     non_snake_case,
     clippy::bool_comparison,
     clippy::missing_safety_doc,
-    clippy::undocumented_unsafe_blocks,
-    rustdoc::bare_urls
+    clippy::undocumented_unsafe_blocks
 )]
-#![warn(unused_crate_dependencies, unreachable_pub)]
+#![warn(
+    unused_crate_dependencies,
+    unreachable_pub,
+    rustdoc::bare_urls,
+    rustdoc::broken_intra_doc_links
+)]
 
 use core::fmt;
 

@@ -25,7 +25,9 @@
     unused_crate_dependencies,
     clippy::missing_safety_doc,
     unreachable_pub,
-    clippy::missing_docs_in_private_items
+    clippy::missing_docs_in_private_items,
+    rustdoc::bare_urls,
+    rustdoc::broken_intra_doc_links
 )]
 
 // Reexports [`endpoint_sec_sys`]
