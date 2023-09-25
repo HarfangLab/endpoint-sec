@@ -2277,6 +2277,70 @@ pub union es_result_t_anon_0 {
 ///
 /// [`RefEncode`] is currently implemented with the encoding left unknown explicitly. If
 /// `es_message_t` needs to be encoded for Objective C messages, this will require changes.
+///
+/// ## A note on userspace events
+///
+/// Before macOS 13.0 almost all ES events were created by `xnu` (the macOS kernel).
+/// Such events are *mandatory*.
+/// If no `es_event_setuid_t` event is emitted then no `setuid` took place. This is a security guarantee.
+/// Most events added in macOS 13 and 14 are emitted by userspace binaries and frameworks.
+/// ES still guarantees that if an event was not emitted *by that binary or framework* then it did not happen, but this is not quite the same guarantee.
+///
+/// Consider `es_event_su_t`:
+/// This event is created by the `su` binary first shipped in macOS 14.0, but it's entirely possible for a user to install (or compile) a different `su`!
+/// ES only guarantees that the platform binary shipped with macOS emits `es_event_su_t` events.
+/// As such `es_event_su_t` does not provide the same security guarantee that `es_event_setuid_t` does.
+///
+/// When a user invokes the platform `su` binary ES will emit both `es_event_su_t` and `es_event_setuid_t` events.
+/// When a user compiles their own `su` binary from source and executes it:
+///
+/// - ES will emit an `es_event_setuid_t` event.
+/// - ES will NOT emit an `es_event_su_t`.
+///
+/// Userspace events are inherently discretionary.
+/// It is at the users discretion as to whether they use the builtin binaries/frameworks or not.
+/// Kernel events are mandatory. There is no `setuid` syscall that ES does not interdict.
+///
+/// The following events are created by userspace binaries or frameworks:
+///
+/// - [`ES_EVENT_TYPE_AUTH_FILE_PROVIDER_MATERIALIZE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_MATERIALIZE`]
+/// - [`ES_EVENT_TYPE_AUTH_FILE_PROVIDER_UPDATE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_UPDATE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_AUTHENTICATION`]
+/// - [`ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED`]
+/// - [`ES_EVENT_TYPE_NOTIFY_XP_MALWARE_REMEDIATED`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGIN`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGOUT`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOCK`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LW_SESSION_UNLOCK`]
+/// - [`ES_EVENT_TYPE_NOTIFY_SCREENSHARING_ATTACH`]
+/// - [`ES_EVENT_TYPE_NOTIFY_SCREENSHARING_DETACH`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGIN`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGOUT`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LOGIN_LOGIN`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LOGIN_LOGOUT`]
+/// - [`ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_PROFILE_ADD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_PROFILE_REMOVE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_SU`]
+/// - [`ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_PETITION`]
+/// - [`ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_JUDGEMENT`]
+/// - [`ES_EVENT_TYPE_NOTIFY_SUDO`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP`]
 #[repr(C)]
 pub struct es_message_t {
     /// Indicates the message version; some fields are not available and must not be accessed unless
