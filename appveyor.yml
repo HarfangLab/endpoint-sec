@@ -12,7 +12,7 @@ test_script:
 # First, build all the tests
 - cargo nextest run --no-run --verbose --locked --offline --all-features
 # Then, add entitlement to all test binaries
-- find target/debug/deps -perm +111 -type f | xargs -I '{}' codesign -s - --entitlements endpoint-sec/Entitlement.plist --force {}
+- find target/debug/deps -perm +111 -type f | grep -v '\.dylib$' | xargs -I '{}' codesign -s - --entitlements endpoint-sec/Entitlement.plist --force {}
 # Now we can run them
 - sudo cargo nextest run --verbose --locked --offline --all-features
 

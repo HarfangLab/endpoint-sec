@@ -38,8 +38,10 @@ mach2.workspace = true
 libc.workspace = true
 static_assertions.workspace = true
 
+
 [target.'cfg(target_os = "macos")'.dev-dependencies]
 sysinfo.workspace = true
+trybuild.workspace = true
 
 [package.metadata.docs.rs]
 features = ["max", "audit_token_from_pid"]

@@ -1,0 +1,13 @@
+error[E0597]: `v` does not live long enough
+  --> tests/ui/test_client_cannot_outlive_handler.rs:7:19
+   |
+4  |     let mut client = {
+   |         ---------- borrow later stored here
+5  |         let v = vec![1, 2, 3];
+6  |         let handler = |_: &mut Client<'_>, _| {
+   |                       ----------------------- value captured here
+7  |             dbg!(&v);
+   |                   ^ borrowed value does not live long enough
+...
+13 |     };
+   |     - `v` dropped here while still borrowed

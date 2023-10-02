@@ -16,7 +16,7 @@ endpoint-sec = { version = "0.2.1", path = "./endpoint-sec" }
 endpoint-sec-sys = { version = "0.2.1", path = "./endpoint-sec-sys" }
 
 # External - Required
-block2 = "0.2"
+block2 = "0.3"
 libc = { version = "0.2", features = ["extra_traits"] }
 mach2 = "0.4"
 objc2 = "0.4"
@@ -24,3 +24,4 @@ static_assertions = "1.1"
 
 # External - For tests
 sysinfo = "0.28"
+trybuild = "1.0"
