@@ -2,6 +2,7 @@
 use std::ffi::OsStr;
 #[cfg(doc)]
 use std::ffi::OsString;
+use std::marker::PhantomData;
 use std::os::unix::prelude::OsStrExt;
 use std::panic::{catch_unwind, RefUnwindSafe};
 use std::ptr::NonNull;
@@ -29,7 +30,7 @@ pub struct Client<'b> {
     inner: NonNull<es_client_t>,
 
     /// Ensure the client cannot outlive its message handling closure.
-    block_lifetime: std::marker::PhantomData<&'b ()>,
+    block_lifetime: PhantomData<&'b ()>,
 }
 
 static_assertions::assert_not_impl_any!(Client: Send, Sync);
@@ -106,7 +107,10 @@ impl Client<'_> {
                 let _err = catch_unwind(|| {
                     // Safety: Apple guarantees the received message is non-null and valid
                     let message = unsafe { Message::from_raw(message) };
-                    let mut client = Client::from_raw(client);
+                    let mut client = Client {
+                        inner: client,
+                        block_lifetime: PhantomData,
+                    };
 
                     handler(&mut client, message);
                     // Forget the client, else it would be double-dropped
@@ -122,7 +126,10 @@ impl Client<'_> {
 
         // Safety: Apple guarantees the received client is non-null and valid since we have checked
         // the result of `es_new_client`.
-        Ok(Client::from_raw(unsafe { NonNull::new_unchecked(client) }))
+        Ok(Client {
+            inner: unsafe { NonNull::new_unchecked(client) },
+            block_lifetime: PhantomData,
+        })
     }
 
     /// Subscribe the client to `events`, without removing previous subscriptions.
@@ -670,14 +677,6 @@ impl Client<'_> {
 
 /// Private helper methods
 impl Client<'_> {
-    /// Construct a client from a raw pointer.
-    fn from_raw<'b>(inner: NonNull<es_client_t>) -> Client<'b> {
-        Client {
-            inner,
-            block_lifetime: std::marker::PhantomData,
-        }
-    }
-
     /// Mutable access to the inner client
     fn as_mut(&mut self) -> &mut es_client_t {
         // Safety: `inner` is valid by construction
