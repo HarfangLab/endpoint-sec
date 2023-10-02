@@ -21,12 +21,15 @@ use crate::{MutedPath, MutedProcess};
 /// This type is neither [`Send`] nor [`Sync`] because the client must be released on the same
 /// thread it was created.
 #[doc(alias = "es_client_t")]
-pub struct Client {
+pub struct Client<'b> {
     /// Pointer to the client, internal state is managed by Apple, we just keep it to pass it in
     /// functions.
     ///
     /// Once constructed, it must never be `null`.
     inner: NonNull<es_client_t>,
+
+    /// Ensure the client cannot outlive its message handling closure.
+    block_lifetime: std::marker::PhantomData<&'b ()>,
 }
 
 static_assertions::assert_not_impl_any!(Client: Send, Sync);
@@ -80,7 +83,7 @@ macro_rules! to_vec_and_free {
 }
 
 /// Public bindings to the underlying [`es_client_t`] API.
-impl Client {
+impl Client<'_> {
     /// Creates a new [`Client`].
     ///
     /// Callers must respect the following requirement if they want this function to succeed:
@@ -92,9 +95,9 @@ impl Client {
     ///
     /// See [`es_new_client()`].
     #[doc(alias = "es_new_client")]
-    pub fn new<F>(handler: F) -> Result<Self, NewClientError>
+    pub fn new<'b, F>(handler: F) -> Result<Client<'b>, NewClientError>
     where
-        F: Fn(&mut Client, Message) + RefUnwindSafe + 'static,
+        F: Fn(&mut Client<'_>, Message) + RefUnwindSafe + 'b,
     {
         let mut client = std::ptr::null_mut();
 
@@ -110,11 +113,10 @@ impl Client {
                     std::mem::forget(client);
                 });
             },
-        )
-        .copy();
+        );
 
         // Safety:
-        // - `handler` is 'static so we can keep a ref through it in `block_handler` without trouble
+        // - `handler` is 'b so we can keep a ref through it in `block_handler` without trouble
         // - The result is checked with `.ok()` below
         unsafe { es_new_client(&mut client, &block_handler) }.ok()?;
 
@@ -667,10 +669,13 @@ impl Client {
 }
 
 /// Private helper methods
-impl Client {
+impl Client<'_> {
     /// Construct a client from a raw pointer.
-    fn from_raw(inner: NonNull<es_client_t>) -> Self {
-        Self { inner }
+    fn from_raw<'b>(inner: NonNull<es_client_t>) -> Client<'b> {
+        Client {
+            inner,
+            block_lifetime: std::marker::PhantomData,
+        }
     }
 
     /// Mutable access to the inner client
@@ -680,7 +685,7 @@ impl Client {
     }
 }
 
-impl Drop for Client {
+impl Drop for Client<'_> {
     /// Note: this implementation ignores the return value of [`es_delete_client`], use
     /// [`Client::delete()`] if you want to check it
     #[doc(alias = "es_delete_client")]
