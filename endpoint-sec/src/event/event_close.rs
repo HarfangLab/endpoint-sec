@@ -22,7 +22,7 @@ impl<'a> EventClose<'a> {
 
     /// The file that is being closed.
     #[inline(always)]
-    pub fn target(&self) -> File<'_> {
+    pub fn target(&self) -> File<'a> {
         // Safety: 'a tied to self, object obtained through ES
         File::new(unsafe { self.raw.target() })
     }

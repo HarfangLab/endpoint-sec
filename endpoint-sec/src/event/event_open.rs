@@ -20,7 +20,7 @@ impl<'a> EventOpen<'a> {
 
     /// The file that will be opened.
     #[inline(always)]
-    pub fn file(&self) -> File<'_> {
+    pub fn file(&self) -> File<'a> {
         // Safety: 'a tied to self, object obtained through ES
         File::new(unsafe { self.raw.file() })
     }

@@ -23,7 +23,7 @@ impl<'a> EventSignal<'a> {
 
     /// The process that will receive the signal.
     #[inline(always)]
-    pub fn target(&self) -> Process<'_> {
+    pub fn target(&self) -> Process<'a> {
         // Safety: 'a tied to self, object obtained through ES
         Process::new(unsafe { self.raw.target() }, self.version)
     }

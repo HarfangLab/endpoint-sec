@@ -17,7 +17,7 @@ pub struct EventFork<'a> {
 impl<'a> EventFork<'a> {
     /// The child process that was created.
     #[inline(always)]
-    pub fn child(&self) -> Process<'_> {
+    pub fn child(&self) -> Process<'a> {
         // Safety: 'a tied to self, object obtained through ES
         Process::new(unsafe { self.raw.child() }, self.version)
     }

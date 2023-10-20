@@ -17,7 +17,7 @@ pub struct EventTrace<'a> {
 impl<'a> EventTrace<'a> {
     /// The process that will be attached to by the process that instigated the event.
     #[inline(always)]
-    pub fn target(&self) -> Process<'_> {
+    pub fn target(&self) -> Process<'a> {
         // Safety: 'a tied to self, object obtained through ES
         Process::new(unsafe { self.raw.target() }, self.version)
     }

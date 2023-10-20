@@ -6,8 +6,7 @@ use std::iter::FusedIterator;
 #[cfg(feature = "macos_13_0_0")]
 use endpoint_sec_sys::{cpu_subtype_t, cpu_type_t};
 use endpoint_sec_sys::{
-    es_event_exec_t, es_exec_arg, es_exec_arg_count, es_exec_env, es_exec_env_count,
-    es_string_token_t,
+    es_event_exec_t, es_exec_arg, es_exec_arg_count, es_exec_env, es_exec_env_count, es_string_token_t,
 };
 #[cfg(feature = "macos_11_0_0")]
 use endpoint_sec_sys::{es_exec_fd, es_exec_fd_count, es_fd_t, ShouldNotBeNull};
@@ -34,7 +33,7 @@ pub struct Fd<'a>(pub(crate) &'a es_fd_t);
 impl<'a> EventExec<'a> {
     /// The new process that is being executed.
     #[inline(always)]
-    pub fn target(&self) -> Process<'_> {
+    pub fn target(&self) -> Process<'a> {
         // Safety: 'a tied to self, object obtained through ES
         Process::new(unsafe { self.raw.target() }, self.version)
     }
@@ -61,7 +60,7 @@ impl<'a> EventExec<'a> {
     /// interpreter (e.g. `./foo.sh` not `/bin/sh ./foo.sh`)
     #[cfg(feature = "macos_10_15_1")]
     #[inline(always)]
-    pub fn script(&self) -> Option<File<'_>> {
+    pub fn script(&self) -> Option<File<'a>> {
         if self.version >= 2 {
             // Safety: Safe as we check the version before accessing the field.
             let script_ptr = unsafe { self.raw.anon_0.anon_0.script };
@@ -77,7 +76,7 @@ impl<'a> EventExec<'a> {
     /// Current working directory at exec time (if present) on version 3 and later, otherwise None.
     #[inline(always)]
     #[cfg(feature = "macos_10_15_4")]
-    pub fn cwd(&self) -> Option<File<'_>> {
+    pub fn cwd(&self) -> Option<File<'a>> {
         if self.version >= 3 {
             // Safety: Safe as File cannot outlive self and as we check the version before accessing the field.
             Some(File::new(unsafe { self.raw.anon_0.anon_0.cwd.as_ref() }))
