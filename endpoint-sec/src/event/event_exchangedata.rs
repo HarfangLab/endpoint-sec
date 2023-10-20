@@ -14,14 +14,14 @@ pub struct EventExchangeData<'a> {
 impl<'a> EventExchangeData<'a> {
     /// The first file to be exchanged.
     #[inline(always)]
-    pub fn file1(&self) -> File<'_> {
+    pub fn file1(&self) -> File<'a> {
         // Safety: 'a tied to self, object obtained through ES
         File::new(unsafe { self.raw.file1() })
     }
 
     /// The second file to be exchanged.
     #[inline(always)]
-    pub fn file2(&self) -> File<'_> {
+    pub fn file2(&self) -> File<'a> {
         // Safety: 'a tied to self, object obtained through ES
         File::new(unsafe { self.raw.file2() })
     }

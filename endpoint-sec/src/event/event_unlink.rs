@@ -14,14 +14,14 @@ pub struct EventUnlink<'a> {
 impl<'a> EventUnlink<'a> {
     /// The object that will be removed.
     #[inline(always)]
-    pub fn target(&self) -> File<'_> {
+    pub fn target(&self) -> File<'a> {
         // Safety: 'a tied to self, object obtained through ES
         File::new(unsafe { self.raw.target() })
     }
 
     /// The parent directory of the `target` file system object.
     #[inline(always)]
-    pub fn parent_dir(&self) -> File<'_> {
+    pub fn parent_dir(&self) -> File<'a> {
         // Safety: 'a tied to self, object obtained through ES
         File::new(unsafe { self.raw.parent_dir() })
     }

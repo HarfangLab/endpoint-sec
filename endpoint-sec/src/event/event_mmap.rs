@@ -38,7 +38,7 @@ impl<'a> EventMmap<'a> {
 
     /// The file system object being mapped.
     #[inline(always)]
-    pub fn source(&self) -> File<'_> {
+    pub fn source(&self) -> File<'a> {
         // Safety: 'a tied to self, object obtained through ES
         File::new(unsafe { self.raw.source() })
     }

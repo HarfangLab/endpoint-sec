@@ -17,7 +17,7 @@ pub struct EventFileProviderMaterialize<'a> {
 impl<'a> EventFileProviderMaterialize<'a> {
     /// The process that instigated the materialization.
     #[inline(always)]
-    pub fn instigator(&self) -> Process<'_> {
+    pub fn instigator(&self) -> Process<'a> {
         // Safety: 'a tied to self, object obtained through ES
         Process::new(unsafe { self.raw.instigator() }, self.version)
     }
