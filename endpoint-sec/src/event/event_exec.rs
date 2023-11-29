@@ -245,23 +245,23 @@ unsafe impl Send for Fd<'_> {}
 #[cfg(feature = "macos_11_0_0")]
 impl_debug_eq_hash_with_functions!(Fd<'a>; fd, fdtype, pipe_id);
 
-/// Generate an iterator implementation for a component of [`EventExec`]
+/// Generate an iterator implementation for an array component of an event.
 ///
 /// Safety:
 ///
-/// - `raw_element_func` will be called like this: `raw_element_func(&es_event_exec, valid index)`,
-///   it must be safe to call under these conditions
+/// - `raw_element_func` will be called like this: `raw_element_func(&raw_es_event, valid index)`,
+///   it must be safe to call under these conditions.
 /// - `raw_to_wrapped` will be called with the result of the preceding operation like this:
 ///   `raw_to_wrapped(raw_token)`. This token COULD be null if `raw_element_func` can return `null`
 ///   when called in the conditions described above. Usually Apple documents that if the event is
 ///   a valid pointer and the index is correct, the function cannot return `null` and that calling
 ///   outside the bounds is undefined behaviour.
-macro_rules! make_exec_iterator {
-    ($(#[$enum_doc:meta])+ $name:ident with $element_count: ident; $item: ty; $raw_element_func: ident, $raw_to_wrapped: ident $(,)?) => {
+macro_rules! make_event_data_iterator {
+    ($wrapped_event: ident; $(#[$enum_doc:meta])+ $name:ident with $element_count: ident; $item: ty; $raw_element_func: ident, $raw_to_wrapped: ident $(,)?) => {
         $(#[$enum_doc])*
         pub struct $name<'event, 'raw> {
             /// Wrapped event
-            ev: &'event EventExec<'raw>,
+            ev: &'event $wrapped_event<'raw>,
             /// Element count. When `current >= count`, the iterator is done and will only return
             /// `None` for all subsequent calls to `next`.
             count: u32,
@@ -271,7 +271,7 @@ macro_rules! make_exec_iterator {
 
         impl $name<'_, '_> {
             /// New iterator from event
-            fn new<'ev, 'raw>(ev: &'ev EventExec<'raw>) -> $name<'ev, 'raw> {
+            fn new<'ev, 'raw>(ev: &'ev $wrapped_event<'raw>) -> $name<'ev, 'raw> {
                 $name {
                     ev,
                     count: ev.$element_count(),
@@ -351,7 +351,8 @@ unsafe fn as_os_str<'a>(x: es_string_token_t) -> &'a OsStr {
     unsafe { &*(x.as_os_str() as *const _) }
 }
 
-make_exec_iterator!(
+make_event_data_iterator!(
+    EventExec;
     /// Iterator over the arguments of an [`EventExec`]
     ExecArgs with arg_count;
     &'raw OsStr;
@@ -359,7 +360,8 @@ make_exec_iterator!(
     as_os_str,
 );
 
-make_exec_iterator!(
+make_event_data_iterator!(
+    EventExec;
     /// Iterator over the environment of an [`EventExec`]
     ExecEnvs with env_count;
     &'raw OsStr;
@@ -377,7 +379,8 @@ unsafe fn make_fd<'a>(fd: ShouldNotBeNull<es_fd_t>) -> Fd<'a> {
 }
 
 #[cfg(feature = "macos_11_0_0")]
-make_exec_iterator!(
+make_event_data_iterator!(
+    EventExec;
     /// Iterator over the file descriptors of an [`EventExec`]
     ExecFds with fd_count;
     Fd<'raw>;
