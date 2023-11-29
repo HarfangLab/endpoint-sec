@@ -335,6 +335,10 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD => NotifyBtmLaunchItemAdd(EventBtmLaunchItemAdd [_ => None] { raw: raw_event.btm_launch_item_add.as_opt()?, version, }),
         /// Notify for a launch item being removed from background task management.
         ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE => NotifyBtmLaunchItemRemove(EventBtmLaunchItemRemove [_ => None] { raw: raw_event.btm_launch_item_remove.as_opt()?, version, }),
+
+        == #[cfg(feature = "macos_14_0_0")]
+        /// Notify about a su policy decisions event.
+        ES_EVENT_TYPE_NOTIFY_SU => NotifySu(EventSu [_ => None] { raw: raw_event.su.as_opt()?, }),
     }
 );
 
@@ -568,4 +572,7 @@ cfg_mod! {
     mod event_login_logout;
     mod event_btm_launch_item_add;
     mod event_btm_launch_item_remove;
+
+    == #[cfg(feature = "macos_14_0_0")];
+    mod event_su;
 }
