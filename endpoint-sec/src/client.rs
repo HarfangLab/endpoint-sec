@@ -119,6 +119,25 @@ impl Client<'_> {
             },
         );
 
+        // Forget the block_handler. es_new_client takes ownership of the Block
+        // by calling Block_copy on it. It does so, even in the case of an
+        // error.
+        //
+        // However, because what we pass to it is a ConcreteBlock (and not an
+        // RcBlock or w.e.), this copy will _not_ be a deep copy - it will
+        // simply `memmove` the closure's struct into a new memory location.
+        //
+        // In a sense, this is similar to doing `Box::new(a)` - the struct a
+        // will be copied to the heap, but all of the pointers contained within
+        // the struct will still have the old value. Because of this, when we do
+        // Box::new(a), we avoid running a's destructor.
+        //
+        // Similarly, here, we gave block_handler to es_new_client, who copied
+        // its struct to its own internal storage. We must now explicitly avoid
+        // calling block_handler's destructor to ensure the objects contained
+        // within stay alive.
+        let block_handler = std::mem::ManuallyDrop::new(block_handler);
+
         // Safety:
         // - `handler` is 'b so we can keep a ref through it in `block_handler` without trouble
         // - The result is checked with `.ok()` below
