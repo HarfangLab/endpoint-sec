@@ -365,7 +365,7 @@ pub enum ExpectedResponseType {
 ///   a valid pointer and the index is correct, the function cannot return `null` and that calling
 ///   outside the bounds is undefined behaviour.
 macro_rules! make_event_data_iterator {
-    ($wrapped_event: ident; $(#[$enum_doc:meta])+ $name:ident with $element_count: ident; $item: ty; $raw_element_func: ident, $raw_to_wrapped: ident $(,)?) => {
+    ($wrapped_event: ident; $(#[$enum_doc:meta])+ $name:ident with $element_count: ident; $item: ty; $raw_element_func: ident, $raw_to_wrapped: path$(,)?) => {
         $(#[$enum_doc])*
         pub struct $name<'event, 'raw> {
             /// Wrapped event
@@ -444,6 +444,19 @@ macro_rules! make_event_data_iterator {
 
         impl FusedIterator for $name<'_, '_> {}
     };
+}
+
+/// Wrapper for the `.as_ref()` call on `es_string_token_t` with lifetime extension.
+///
+/// # Safety
+///
+/// This is a horrible horrible hack. Apple documents that the `es_string_token_t` returned by
+/// both [`es_exec_env`] and [`es_exec_arg`] are zero-allocation when in bounds and that the
+/// returned string token must not outlive the original event, which it cannot do in our
+/// iterator so it's safe. Thanks Rust for references and the borrow checker.
+unsafe fn as_os_str<'a>(x: endpoint_sec_sys::es_string_token_t) -> &'a std::ffi::OsStr {
+    // Safety: this is only called inside the iterator where `'a` will be the lifetime of `&mut self`
+    unsafe { &*(x.as_os_str() as *const _) }
 }
 
 /// Helper macro to define the event modules without copying the cfgs dozens of times.

@@ -5,9 +5,7 @@ use std::iter::FusedIterator;
 
 #[cfg(feature = "macos_13_0_0")]
 use endpoint_sec_sys::{cpu_subtype_t, cpu_type_t};
-use endpoint_sec_sys::{
-    es_event_exec_t, es_exec_arg, es_exec_arg_count, es_exec_env, es_exec_env_count, es_string_token_t,
-};
+use endpoint_sec_sys::{es_event_exec_t, es_exec_arg, es_exec_arg_count, es_exec_env, es_exec_env_count};
 #[cfg(feature = "macos_11_0_0")]
 use endpoint_sec_sys::{es_exec_fd, es_exec_fd_count, es_fd_t, ShouldNotBeNull};
 
@@ -245,26 +243,13 @@ unsafe impl Send for Fd<'_> {}
 #[cfg(feature = "macos_11_0_0")]
 impl_debug_eq_hash_with_functions!(Fd<'a>; fd, fdtype, pipe_id);
 
-/// Wrapper for the `.as_ref()` call on `es_string_token_t` with lifetime extension.
-///
-/// # Safety
-///
-/// This is a horrible horrible hack. Apple documents that the `es_string_token_t` returned by
-/// both [`es_exec_env`] and [`es_exec_arg`] are zero-allocation when in bounds and that the
-/// returned string token must not outlive the original event, which it cannot do in our
-/// iterator so it's safe. Thanks Rust for references and the borrow checker.
-unsafe fn as_os_str<'a>(x: es_string_token_t) -> &'a OsStr {
-    // Safety: this is only called inside the iterator where `'a` will be the lifetime of `&mut self`
-    unsafe { &*(x.as_os_str() as *const _) }
-}
-
 make_event_data_iterator!(
     EventExec;
     /// Iterator over the arguments of an [`EventExec`]
     ExecArgs with arg_count;
     &'raw OsStr;
     es_exec_arg,
-    as_os_str,
+    super::as_os_str,
 );
 
 make_event_data_iterator!(
@@ -273,7 +258,7 @@ make_event_data_iterator!(
     ExecEnvs with env_count;
     &'raw OsStr;
     es_exec_env,
-    as_os_str,
+    super::as_os_str,
 );
 
 /// Helper to declare the [`ExecFds`] iterator
