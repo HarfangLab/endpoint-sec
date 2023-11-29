@@ -365,16 +365,16 @@ pub enum ExpectedResponseType {
 ///   a valid pointer and the index is correct, the function cannot return `null` and that calling
 ///   outside the bounds is undefined behaviour.
 macro_rules! make_event_data_iterator {
-    ($wrapped_event: ident; $(#[$enum_doc:meta])+ $name:ident with $element_count: ident; $item: ty; $raw_element_func: ident, $raw_to_wrapped: path$(,)?) => {
+    ($wrapped_event: ident; $(#[$enum_doc:meta])+ $name:ident with $element_count: ident ($count_ty: ty); $item: ty; $raw_element_func: ident, $raw_to_wrapped: path$(,)?) => {
         $(#[$enum_doc])*
         pub struct $name<'event, 'raw> {
             /// Wrapped event
             ev: &'event $wrapped_event<'raw>,
             /// Element count. When `current >= count`, the iterator is done and will only return
             /// `None` for all subsequent calls to `next`.
-            count: u32,
+            count: $count_ty,
             /// A call to `next` will yield element `current`
-            current: u32,
+            current: $count_ty,
         }
 
         impl $name<'_, '_> {
@@ -388,7 +388,7 @@ macro_rules! make_event_data_iterator {
             }
         }
 
-        impl<'raw> Iterator for $name<'_, 'raw> {
+        impl<'raw> std::iter::Iterator for $name<'_, 'raw> {
             type Item = $item;
 
             fn next(&mut self) -> Option<Self::Item> {
@@ -406,7 +406,7 @@ macro_rules! make_event_data_iterator {
 
             #[inline(always)]
             fn nth(&mut self, n: usize) -> Option<Self::Item> {
-                self.current = n.min(u32::MAX as usize) as u32;
+                self.current = n.min(<$count_ty>::MAX as usize) as $count_ty;
                 self.next()
             }
 
@@ -433,16 +433,16 @@ macro_rules! make_event_data_iterator {
             }
         }
 
-        impl ExactSizeIterator for $name<'_, '_> {
+        impl std::iter::ExactSizeIterator for $name<'_, '_> {
             #[inline(always)]
             fn len(&self) -> usize {
                 // Casting to usize if ok: all macOS machines are 64 bits now so a u32 will always
                 // fit into a usize
-                self.count.saturating_sub(self.current) as _
+                self.count.saturating_sub(self.current) as usize
             }
         }
 
-        impl FusedIterator for $name<'_, '_> {}
+        impl std::iter::FusedIterator for $name<'_, '_> {}
     };
 }
 
