@@ -127,8 +127,6 @@ pub struct es_process_t {
     /// The team id of the code signature associated with this process
     pub team_id: es_string_token_t,
     /// The executable file that is executing in this process.
-    ///
-    /// **Non**-nullable
     pub executable: ShouldNotBeNull<es_file_t>,
     /// The TTY this process is associated with, or NULL if the process does not have an associated
     /// TTY. The TTY is a property of the POSIX session the process belongs to. A process' session
@@ -292,9 +290,10 @@ pub struct es_btm_launch_item_t {
 /// This information is gathered prior to the program being replaced. The other `es_process_t`,
 /// within the `es_event_exec_t` struct (named `target`), contains information about the program
 /// after the image has been replaced by `execve(2)` (or `posix_spawn(2)`). This means that both
-/// `es_process_t` structs refer to the same process, but not necessarily the same program. Also,
-/// note that the `audit_token_t` structs contained in the two different `es_process_t` structs
-/// will not be identical: the `pidversion` field will be updated, and the UID/GID values may be
+/// `es_process_t` structs refer to the same process (as identified by pid), but not necessarily the
+/// same program, and definitely not the same program execution (as identified by pid, pidversion
+/// tuple). The `audit_token_t` structs contained in the two different `es_process_t` structs will
+/// not be identical: the `pidversion` field will be updated, and the UID/GID values may be
 /// different if the new program had `setuid`/`setgid` permission bits set.
 ///
 /// Cache key for this event type: `(process executable file, target executable file)`.
@@ -1340,7 +1339,7 @@ should_not_be_null_fields!(es_event_uipc_bind_t; dir -> es_file_t);
 pub struct es_event_uipc_connect_t {
     /// Describes the socket file that the socket is bound to
     pub file: ShouldNotBeNull<es_file_t>,
-    /// The cmmunications domain of the socket (see `socket(2)`)
+    /// The communications domain of the socket (see `socket(2)`)
     pub domain: c_int,
     /// The type of the socket (see `socket(2)`)
     pub type_: c_int,
@@ -1875,6 +1874,10 @@ pub struct es_event_lw_session_unlock_t {
 /// Notification that Screen Sharing has attached to a graphical session.
 ///
 /// This event type does not support caching (notify-only).
+///
+/// This event is not emitted when a screensharing session has the same source and destination
+/// address. For example if device A is acting as a NAT gateway for device B, then a screensharing
+/// session from B -> A would not emit an event.
 #[cfg(feature = "macos_13_0_0")]
 #[repr(C)]
 pub struct es_event_screensharing_attach_t {
@@ -1905,6 +1908,9 @@ pub struct es_event_screensharing_attach_t {
 /// Notification that Screen Sharing has detached from a graphical session.
 ///
 /// This event type does not support caching (notify-only).
+///
+/// This event is not emitted when a screensharing session has the same source and destination
+/// address.
 #[cfg(feature = "macos_13_0_0")]
 #[repr(C)]
 pub struct es_event_screensharing_detach_t {
