@@ -13,6 +13,8 @@ pub use std::os::raw::c_int;
 #[cfg(feature = "macos_13_0_0")]
 pub use libc::{cpu_subtype_t, cpu_type_t};
 pub use libc::{dev_t, gid_t, mode_t, pid_t, stat, statfs, timespec, timeval, uid_t};
+#[cfg(feature = "macos_14_0_0")]
+use mach2::mach_types::uuid_t;
 use objc2::{Encoding, RefEncode};
 
 #[cfg(feature = "macos_10_15_4")]
@@ -25,6 +27,10 @@ use super::{
 };
 #[cfg(feature = "macos_13_0_0")]
 use super::{es_address_type_t, es_authentication_type_t};
+#[cfg(feature = "macos_14_0_0")]
+use super::{
+    es_authorization_rule_class_t, es_od_account_type_t, es_od_member_type_t, es_od_record_type_t, es_xpc_domain_type_t,
+};
 
 /// Provides the [`stat`][struct@stat] information and path to a file that relates to a security
 /// event. The path may be truncated, which is indicated by the `path_truncated` flag.
@@ -261,6 +267,36 @@ pub struct es_btm_launch_item_t {
     /// Optional. URL for app the item is attributed to.
     // NOTE: find out how optionality is modeled. Empty string ? Linked to an enum member ?
     pub app_url: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// Source of profile installation (MDM/Manual Install).
+    ///
+    /// See [`es_profile_t`]
+    es_profile_source_t(u32);
+
+    == MACOS_14_0_0;
+    ES_PROFILE_SOURCE_MANAGED = 0,
+    --
+    ES_PROFILE_SOURCE_INSTALL = 1,
+);
+
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_profile_t {
+    /// Profile identifier
+    pub identifier: es_string_token_t,
+    /// Profile UUID
+    pub uuid: es_string_token_t,
+    /// Source of Profile installation (MDM/Manual Install)
+    pub install_source: es_profile_source_t,
+    /// Profile organization name
+    pub organization: es_string_token_t,
+    /// Profile display name
+    pub display_name: es_string_token_t,
+    /// Profile scope
+    pub scope: es_string_token_t,
 }
 
 /// Execute a new process
@@ -2085,6 +2121,639 @@ should_not_be_null_fields!(es_event_btm_launch_item_remove_t; item -> es_btm_lau
 #[cfg(feature = "macos_13_0_0")]
 null_fields!(es_event_btm_launch_item_remove_t; instigator -> es_process_t, app -> es_process_t);
 
+/// Notification for a su policy decisions events.
+///
+/// This event type does not support caching (notify-only). Should always
+/// emit on success but will only emit on security relevant failures. For example,
+/// Endpoint Security clients will not get an event for `su` being passed invalid
+/// command line arguments.
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_su_t {
+    /// True iff su was successful.
+    pub success: bool,
+    /// Optional. If success is false, a failure message is contained in this field
+    pub failure_message: es_string_token_t,
+    /// The uid of the user who initiated the su
+    pub from_uid: uid_t,
+    /// The name of the user who initiated the su
+    pub from_name: es_string_token_t,
+    /// True iff su was successful, Describes whether or not the to_uid is interpretable
+    pub has_to_uid: bool,
+    /// Optional. If success, the user ID that is going to be substituted
+    pub to_uid: es_event_su_t_anon0,
+    /// Optional. If success, the user name that is going to be substituted
+    pub to_username: es_string_token_t,
+    /// Optional. If success, the shell is going to execute
+    pub shell: es_string_token_t,
+    /// The length of argv
+    pub argc: usize,
+    /// If success, the arguments are passed into to the shell
+    pub argv: *mut es_string_token_t,
+    /// The length of env
+    pub env_count: usize,
+    /// If success, list of environment variables that is going to be substituted
+    pub env: *mut es_string_token_t,
+}
+
+/// See [`es_event_su_t`]
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub union es_event_su_t_anon0 {
+    pub uid: uid_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// Describes the type of plugin types in sudo.
+    es_sudo_plugin_type_t(u32);
+
+    == MACOS_14_0_0;
+    ES_SUDO_PLUGIN_TYPE_UNKNOWN = 0,
+    ES_SUDO_PLUGIN_TYPE_FRONT_END = 1,
+    ES_SUDO_PLUGIN_TYPE_POLICY = 2,
+    ES_SUDO_PLUGIN_TYPE_IO = 3,
+    ES_SUDO_PLUGIN_TYPE_AUDIT = 4,
+    --
+    ES_SUDO_PLUGIN_TYPE_APPROVAL = 5,
+);
+
+/// Provides context about failures in [`es_event_sudo_t`].
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_sudo_reject_info_t {
+    /// The sudo plugin that initiated the reject
+    pub plugin_name: es_string_token_t,
+    /// The sudo plugin type that initiated the reject
+    pub plugin_type: es_sudo_plugin_type_t,
+    /// A reason represented by a string for the failure
+    pub failure_message: es_string_token_t,
+}
+
+/// Notification for a sudo event.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_sudo_t {
+    /// True iff sudo was successful
+    pub success: bool,
+    /// Optional. When success is false, describes why sudo was rejected
+    pub reject_info: *mut es_sudo_reject_info_t,
+    /// Describes whether or not the from_uid is interpretable
+    pub has_from_uid: bool,
+    /// Optional. The uid of the user who initiated the su
+    pub from_uid: es_event_sudo_t_anon0,
+    /// Optional. The name of the user who initiated the su
+    pub from_username: es_string_token_t,
+    /// Describes whether or not the to_uid is interpretable
+    pub has_to_uid: bool,
+    /// Optional. If success, the user ID that is going to be substituted
+    pub to_uid: es_event_sudo_t_anon0,
+    /// Optional. If success, the user name that is going to be substituted
+    pub to_username: es_string_token_t,
+    /// Optional. The command to be run
+    pub command: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+null_fields!(es_event_sudo_t; reject_info -> es_sudo_reject_info_t);
+
+/// [`es_event_sudo_t`]
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub union es_event_sudo_t_anon0 {
+    uid: uid_t,
+}
+
+/// Notification for Profiles installed on the system.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_profile_add_t {
+    /// Process that instigated the Profile install or update.
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Indicates if the profile is an update to an already installed profile.
+    pub is_update: bool,
+    /// Profile install item.
+    pub profile: ShouldNotBeNull<es_profile_t>,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_profile_add_t; instigator -> es_process_t, profile -> es_profile_t);
+
+/// Notification for Profiles removed on the system.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_profile_remove_t {
+    /// Process that instigated the Profile removal.
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Profile being removed.
+    pub profile: ShouldNotBeNull<es_profile_t>,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_profile_remove_t; instigator -> es_process_t, profile -> es_profile_t);
+
+/// Notification that a process peititioned for certain authorization rights
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_authorization_petition_t {
+    /// Process that submitted the petition (XPC caller)
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Process that created the petition
+    pub petitioner: *mut es_process_t,
+    /// Flags associated with the petition. Defined in Security framework "Authorization/Authorization.h"
+    pub flags: u32,
+    /// The number of elements in `rights`
+    pub right_count: usize,
+    /// Array of string tokens, each token is the name of a right being requested
+    pub rights: *mut es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_authorization_petition_t; instigator -> es_process_t);
+#[cfg(feature = "macos_14_0_0")]
+null_fields!(es_event_authorization_petition_t; petitioner -> es_process_t);
+
+/// Describes, for a single right, the class of that right and if it was granted
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_authorization_result_t {
+    /// The name of the right being considered
+    pub right_name: es_string_token_t,
+    /// The class of the right being considered
+    ///
+    /// The rule class determines how the operating system determines if it should be granted or not
+    pub rule_class: es_authorization_rule_class_t,
+    /// Indicates if the right was granted or not
+    pub granted: bool,
+}
+
+/// Notification that a process had it's right petition judged
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_authorization_judgement_t {
+    /// Process that submitted the petition (XPC caller)
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Process that created the petition
+    pub petitioner: *mut es_process_t,
+    /// The overall result of the petition. 0 indicates success.
+    ///
+    /// Possible return codes are defined in Security framework "Authorization/Authorization.h"
+    pub return_code: i32,
+    /// The number of elements in `results`
+    pub result_count: usize,
+    /// Array of results. One for each right that was petitioned
+    pub results: *mut es_authorization_result_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_authorization_judgement_t; instigator -> es_process_t);
+#[cfg(feature = "macos_14_0_0")]
+null_fields!(es_event_authorization_judgement_t; petitioner -> es_process_t);
+
+/// The identity of a group member
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_od_member_id_t {
+    /// Indicates the type of the member, and how it is identified.
+    ///
+    /// Note that member_type indicates which field of member_value is initialised.
+    pub member_type: es_od_member_type_t,
+    /// The member identity.
+    pub member_value: es_od_member_id_t_anon0,
+}
+
+/// See [`es_od_member_id_t`]
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub union es_od_member_id_t_anon0 {
+    pub uuid: uuid_t,
+    pub name: ManuallyDrop<es_string_token_t>,
+}
+
+/// Notification that a member was added to a group.
+///
+/// This event type does not support caching (notify-only).
+///
+/// This event does not indicate that a member was actually added. For example when adding a user
+/// to a group they are already a member of.
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_group_add_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    pub error_code: i32,
+    /// The group to which the member was added.
+    pub group_name: es_string_token_t,
+    /// The identity of the member added.
+    pub member: ShouldNotBeNull<es_od_member_id_t>,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_group_add_t; instigator -> es_process_t);
+
+/// Notification that a member was removed to a group.
+///
+/// This event type does not support caching (notify-only).
+///
+/// This event does not indicate that a member was actually removed. For example when removing a user
+/// to a group they are already a member of.
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_group_remove_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    pub error_code: i32,
+    /// The group to which the member was removed.
+    pub group_name: es_string_token_t,
+    /// The identity of the member removed.
+    pub member: ShouldNotBeNull<es_od_member_id_t>,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_group_remove_t; instigator -> es_process_t);
+
+/// An array of group member identities.
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_od_member_id_array_t {
+    /// Indicates the type of the members, and how they are identified.
+    ///
+    /// Note that `member_type` indicates which field of member_array is initialised.
+    pub member_type: es_od_member_type_t,
+    /// The number of elements in `member_array`.
+    pub member_count: usize,
+    /// A union of pointers.
+    ///
+    /// The initialised member points to the first element of an array of member values.
+    pub member_array: es_od_member_id_array_t_anon0,
+}
+
+/// See [`es_od_member_id_array_t`]
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub union es_od_member_id_array_t_anon0 {
+    pub uuids: ShouldNotBeNull<uuid_t>,
+    pub names: ShouldNotBeNull<es_string_token_t>,
+}
+
+/// Notification that a group had it's members initialised or replaced.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_group_set_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The group to which members were set.
+    pub group_name: es_string_token_t,
+    /// Array of new members.
+    pub member: ShouldNotBeNull<es_od_member_id_t>,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_group_set_t; instigator -> es_process_t);
+
+/// Notification that an account had its password modified.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_modify_password_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The type of the account for which the password was modified.
+    pub account_type: es_od_account_type_t,
+    /// The name of the account for which the password was modified.
+    pub account_name: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_modify_password_t; instigator -> es_process_t);
+
+/// Notification that a user account was disabled.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_disable_user_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The name of the user account that was disabled.
+    pub user_name: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_disable_user_t; instigator -> es_process_t);
+
+/// Notification that a user account was enabled.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_enable_user_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The name of the user account that was enabled.
+    pub user_name: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_enable_user_t; instigator -> es_process_t);
+
+/// Notification that an attribute value was added to a record.
+///
+/// This event type does not support caching (notify-only).
+///
+/// Attributes conceptually have the type `Map String (Set String)`.
+/// Each OD record has a Map of attribute name to Set of attribute value.
+/// When an attribute value is added, it is inserted into the set of values for that name.
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_attribute_value_add_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The type of the record to which the attribute value was added.
+    pub record_type: es_od_record_type_t,
+    /// The name of the record to which the attribute value was added.
+    pub record_name: es_string_token_t,
+    /// The name of the attribute to which the value was added.
+    pub attribute_name: es_string_token_t,
+    /// The value that was added.
+    pub attribute_value: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_attribute_value_add_t; instigator -> es_process_t);
+
+/// Notification that an attribute value was removed to a record.
+///
+/// This event type does not support caching (notify-only).
+///
+/// Attributes conceptually have the type `Map String (Set String)`.
+/// Each OD record has a Map of attribute name to Set of attribute value.
+/// When an attribute value is removed, it is inserted into the set of values for that name.
+///
+/// Removing a value that was never added is a no-op.
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_attribute_value_remove_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The type of the record to which the attribute value was removed.
+    pub record_type: es_od_record_type_t,
+    /// The name of the record to which the attribute value was removed.
+    pub record_name: es_string_token_t,
+    /// The name of the attribute to which the value was removed.
+    pub attribute_name: es_string_token_t,
+    /// The value that was removed.
+    pub attribute_value: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+/// Notification that an attribute is being set.
+///
+/// This event type does not support caching (notify-only).
+///
+/// Attributes conceptually have the type `Map String (Set String)`.
+/// Each OD record has a Map of attribute name to Set of attribute value.
+/// When an attribute value is added, it is inserted into the set of values for that name.
+///
+/// The new set of attribute values may be empty.
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_attribute_set_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The type of the record for which the attribute is being set.
+    pub record_type: es_od_record_type_t,
+    /// The name of the record for which the attribute is being set.
+    pub record_name: es_string_token_t,
+    /// The name of the attribute that was set.
+    pub attribute_name: es_string_token_t,
+    /// The size of attribute_value_array.
+    pub attribute_value_count: usize,
+    /// Array of attribute values that were set.
+    pub attribute_value_array: *mut es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_attribute_set_t; instigator -> es_process_t);
+
+/// Notification that a user account was created.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_create_user_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The name of the user account that was created.
+    pub user_name: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_create_user_t; instigator -> es_process_t);
+
+/// Notification that a group was created.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_create_group_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The name of the group account that was created.
+    pub group_name: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_create_group_t; instigator -> es_process_t);
+
+/// Notification that a user account was deleted.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_delete_user_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The name of the user account that was deleted.
+    pub user_name: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_delete_user_t; instigator -> es_process_t);
+
+/// Notification that a group was deleted.
+///
+/// This event type does not support caching (notify-only).
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_od_delete_group_t {
+    /// Process that instigated operation (XPC caller).
+    pub instigator: ShouldNotBeNull<es_process_t>,
+    /// Result code for the operation.
+    ///
+    /// Values indicating specific failure reasons are defined in odconstants.h.
+    pub error_code: i32,
+    /// The name of the group account that was deleted.
+    pub group_name: es_string_token_t,
+    /// OD node being mutated.
+    ///
+    /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    pub node_name: es_string_token_t,
+    /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
+    /// OD is authenticating.
+    pub db_path: es_string_token_t,
+}
+
+#[cfg(feature = "macos_14_0_0")]
+should_not_be_null_fields!(es_event_od_delete_group_t; instigator -> es_process_t);
+
+/// Notification for an XPC connection being established to a named service.
+#[cfg(feature = "macos_14_0_0")]
+#[repr(C)]
+pub struct es_event_xpc_connect_t {
+    /// Service name of the named service.
+    pub service_name: es_string_token_t,
+    pub service_domain_type: es_xpc_domain_type_t,
+}
+
 /// Union of all possible events that can appear in an [`es_message_t`]
 #[repr(C)]
 pub union es_events_t {
@@ -2243,6 +2912,48 @@ pub union es_events_t {
     pub btm_launch_item_add: ShouldNotBeNull<es_event_btm_launch_item_add_t>,
     #[cfg(feature = "macos_13_0_0")]
     pub btm_launch_item_remove: ShouldNotBeNull<es_event_btm_launch_item_remove_t>,
+
+    // 14.0.0
+    #[cfg(feature = "macos_14_0_0")]
+    pub profile_add: ShouldNotBeNull<es_event_profile_add_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub profile_remove: ShouldNotBeNull<es_event_profile_remove_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub su: ShouldNotBeNull<es_event_su_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub authorization_petition: ShouldNotBeNull<es_event_authorization_petition_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub authorization_judgement: ShouldNotBeNull<es_event_authorization_judgement_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub sudo: ShouldNotBeNull<es_event_sudo_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_group_add: ShouldNotBeNull<es_event_od_group_add_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_group_remove: ShouldNotBeNull<es_event_od_group_remove_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_group_set: ShouldNotBeNull<es_event_od_group_set_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_modify_password: ShouldNotBeNull<es_event_od_modify_password_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_disable_user: ShouldNotBeNull<es_event_od_disable_user_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_enable_user: ShouldNotBeNull<es_event_od_enable_user_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_attribute_value_add: ShouldNotBeNull<es_event_od_attribute_value_add_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_attribute_value_remove: ShouldNotBeNull<es_event_od_attribute_value_remove_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_attribute_set: ShouldNotBeNull<es_event_od_attribute_set_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_create_user: ShouldNotBeNull<es_event_od_create_user_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_create_group: ShouldNotBeNull<es_event_od_create_group_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_delete_user: ShouldNotBeNull<es_event_od_delete_user_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub od_delete_group: ShouldNotBeNull<es_event_od_delete_group_t>,
+    #[cfg(feature = "macos_14_0_0")]
+    pub xpc_connect: ShouldNotBeNull<es_event_xpc_connect_t>,
 }
 
 /// Indicates the result of the ES subsystem authorization process

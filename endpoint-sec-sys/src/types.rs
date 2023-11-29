@@ -101,6 +101,23 @@ ffi_wrap_enum!(
     ES_PROC_CHECK_TYPE_UDATA_INFO = 0xe,
 );
 
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// This enum describes the types of XPC service domains.
+    es_xpc_domain_type_t(u32);
+
+    == MACOS_14_0_0;
+    ES_XPC_DOMAIN_TYPE_SYSTEM = 1,
+    ES_XPC_DOMAIN_TYPE_USER = 2,
+    ES_XPC_DOMAIN_TYPE_USER_LOGIN = 3,
+    ES_XPC_DOMAIN_TYPE_SESSION = 4,
+    ES_XPC_DOMAIN_TYPE_PID = 5,
+    ES_XPC_DOMAIN_TYPE_MANAGER = 6,
+    ES_XPC_DOMAIN_TYPE_PORT = 7,
+    --
+    ES_XPC_DOMAIN_TYPE_GUI = 8,
+);
+
 #[cfg(feature = "macos_13_0_0")]
 ffi_wrap_enum!(
     /// This enum describes the types of authentications that
@@ -284,6 +301,29 @@ ffi_wrap_enum!(
     ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD = 124,
     --
     ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE = 125,
+
+    == MACOS_14_0_0;
+    ES_EVENT_TYPE_NOTIFY_PROFILE_ADD = 126,
+    ES_EVENT_TYPE_NOTIFY_PROFILE_REMOVE = 127,
+    ES_EVENT_TYPE_NOTIFY_SU = 128,
+    ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_PETITION = 129,
+    ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_JUDGEMENT = 130,
+    ES_EVENT_TYPE_NOTIFY_SUDO = 131,
+    ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD = 132,
+    ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE = 133,
+    ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET = 134,
+    ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD = 135,
+    ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER = 136,
+    ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER = 137,
+    ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD = 138,
+    ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE = 139,
+    ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET = 140,
+    ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER = 141,
+    ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP = 142,
+    ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER = 143,
+    ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP = 144,
+    --
+    ES_EVENT_TYPE_NOTIFY_XPC_CONNECT = 145,
 );
 
 ffi_wrap_enum!(
@@ -535,4 +575,64 @@ ffi_wrap_enum!(
     --
     /// There was an error querying mute inversion state
     ES_MUTE_INVERTED_ERROR = 2,
+);
+
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// The class of rules used to evaluate the petition for a specific authorization right
+    es_authorization_rule_class_t(u32);
+
+    == MACOS_14_0_0;
+    /// Right is judged on user properties
+    ES_AUTHORIZATION_RULE_CLASS_USER = 0,
+    /// Right is judged by a tree of sub-rules
+    ES_AUTHORIZATION_RULE_CLASS_RULE = 1,
+    /// Right is judged by one or more plugins
+    ES_AUTHORIZATION_RULE_CLASS_MECHANISM = 2,
+    /// Right is always granted
+    ES_AUTHORIZATION_RULE_CLASS_ALLOW = 3,
+    /// Right is always denied
+    ES_AUTHORIZATION_RULE_CLASS_DENY = 4,
+    /// Right is unknown
+    ES_AUTHORIZATION_RULE_CLASS_UNKNOWN = 5,
+    --
+    /// Right is invalid
+    ES_AUTHORIZATION_RULE_CLASS_INVALID = 6,
+);
+
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// Type of a group member, used in OpenDirectory (od) events
+    es_od_member_type_t(u32);
+
+    == MACOS_14_0_0;
+    /// Group member is a user, designated by name
+    ES_OD_MEMBER_TYPE_USER_NAME = 0,
+    /// Group member is a user, designated by UUID
+    ES_OD_MEMBER_TYPE_USER_UUID = 1,
+    --
+    /// Group member is another group, designated by UUID
+    ES_OD_MEMBER_TYPE_GROUP_UUID = 2,
+);
+
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// Type of an account, used in OpenDirectory (od) events
+    es_od_account_type_t(u32);
+
+    == MACOS_14_0_0;
+    ES_OD_ACCOUNT_TYPE_USER = 0,
+    --
+    ES_OD_ACCOUNT_TYPE_COMPUTER = 1,
+);
+
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// Type of a record, used in OpenDirectory (od) events
+    es_od_record_type_t(u32);
+
+    == MACOS_14_0_0;
+    ES_OD_RECORD_TYPE_USER = 0,
+    --
+    ES_OD_RECORD_TYPE_GROUP = 1,
 );
