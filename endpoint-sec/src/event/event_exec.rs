@@ -1,7 +1,6 @@
 //! [`EventExec`]
 
 use std::ffi::OsStr;
-use std::iter::FusedIterator;
 
 #[cfg(feature = "macos_13_0_0")]
 use endpoint_sec_sys::{cpu_subtype_t, cpu_type_t};
@@ -246,7 +245,7 @@ impl_debug_eq_hash_with_functions!(Fd<'a>; fd, fdtype, pipe_id);
 make_event_data_iterator!(
     EventExec;
     /// Iterator over the arguments of an [`EventExec`]
-    ExecArgs with arg_count;
+    ExecArgs with arg_count (u32);
     &'raw OsStr;
     es_exec_arg,
     super::as_os_str,
@@ -255,7 +254,7 @@ make_event_data_iterator!(
 make_event_data_iterator!(
     EventExec;
     /// Iterator over the environment of an [`EventExec`]
-    ExecEnvs with env_count;
+    ExecEnvs with env_count (u32);
     &'raw OsStr;
     es_exec_env,
     super::as_os_str,
@@ -274,7 +273,7 @@ unsafe fn make_fd<'a>(fd: ShouldNotBeNull<es_fd_t>) -> Fd<'a> {
 make_event_data_iterator!(
     EventExec;
     /// Iterator over the file descriptors of an [`EventExec`]
-    ExecFds with fd_count;
+    ExecFds with fd_count (u32);
     Fd<'raw>;
     es_exec_fd,
     make_fd,
