@@ -2260,7 +2260,7 @@ pub struct es_event_profile_remove_t {
 #[cfg(feature = "macos_14_0_0")]
 should_not_be_null_fields!(es_event_profile_remove_t; instigator -> es_process_t, profile -> es_profile_t);
 
-/// Notification that a process peititioned for certain authorization rights
+/// Notification that a process petitioned for certain authorization rights
 ///
 /// This event type does not support caching (notify-only).
 #[cfg(feature = "macos_14_0_0")]
