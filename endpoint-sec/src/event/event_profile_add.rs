@@ -94,4 +94,7 @@ impl<'a> Profile<'a> {
     }
 }
 
+// Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Send for Profile<'_> {}
+
 impl_debug_eq_hash_with_functions!(Profile<'a>; identifier, uuid, install_source, organization, display_name, scope);
