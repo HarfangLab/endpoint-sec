@@ -277,8 +277,10 @@ ffi_wrap_enum!(
     es_profile_source_t(u32);
 
     == MACOS_14_0_0;
+    /// MDM (managed) installation
     ES_PROFILE_SOURCE_MANAGED = 0,
     --
+    /// Manual installation
     ES_PROFILE_SOURCE_INSTALL = 1,
 );
 
