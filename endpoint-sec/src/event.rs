@@ -343,6 +343,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_PROFILE_REMOVE => NotifyProfileRemove (EventProfileRemove [_ => None] { raw: raw_event.profile_remove.as_opt()?, version, }),
         /// Notify about a su policy decisions event.
         ES_EVENT_TYPE_NOTIFY_SU => NotifySu(EventSu [_ => None] { raw: raw_event.su.as_opt()?, }),
+        /// Notify about a process petitioned for certain authorization rights.
+        ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_PETITION => NotifyAuthorizationPetition (EventAuthorizationPetition [_ => None] { raw: raw_event.authorization_petition.as_opt()?, version, }),
     }
 );
 
@@ -581,4 +583,5 @@ cfg_mod! {
     mod event_profile_add;
     mod event_profile_remove;
     mod event_su;
+    mod event_authorization_petition;
 }
