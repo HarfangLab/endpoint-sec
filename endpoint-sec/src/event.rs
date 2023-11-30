@@ -339,6 +339,8 @@ define_event_enum!(
         == #[cfg(feature = "macos_14_0_0")]
         /// Notify about Profiles installed on the system.
         ES_EVENT_TYPE_NOTIFY_PROFILE_ADD => NotifyProfileAdd (EventProfileAdd [_ => None] { raw: raw_event.profile_add.as_opt()?, version, }),
+        /// Notify about Profiles removed on the system.
+        ES_EVENT_TYPE_NOTIFY_PROFILE_REMOVE => NotifyProfileRemove (EventProfileRemove [_ => None] { raw: raw_event.profile_remove.as_opt()?, version, }),
         /// Notify about a su policy decisions event.
         ES_EVENT_TYPE_NOTIFY_SU => NotifySu(EventSu [_ => None] { raw: raw_event.su.as_opt()?, }),
     }
@@ -577,5 +579,6 @@ cfg_mod! {
 
     == #[cfg(feature = "macos_14_0_0")];
     mod event_profile_add;
+    mod event_profile_remove;
     mod event_su;
 }
