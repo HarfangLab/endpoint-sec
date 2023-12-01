@@ -462,6 +462,17 @@ impl es_string_token_t {
             OsStr::from_bytes(&[])
         }
     }
+
+    /// See the data as an [`OsStr`] if it's not empty or null.
+    ///
+    /// # Safety
+    ///
+    /// See [`Self::as_os_str()`].
+    #[inline]
+    pub unsafe fn as_opt_os_str(&self) -> Option<&OsStr> {
+        let s = self.as_os_str();
+        (s.is_empty() == false).then_some(s)
+    }
 }
 
 ffi_wrap_enum!(
