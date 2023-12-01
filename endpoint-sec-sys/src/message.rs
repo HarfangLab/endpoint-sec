@@ -2225,7 +2225,7 @@ null_fields!(es_event_sudo_t; reject_info -> es_sudo_reject_info_t);
 #[cfg(feature = "macos_14_0_0")]
 #[repr(C)]
 pub union es_event_sudo_t_anon0 {
-    uid: uid_t,
+    pub uid: uid_t,
 }
 
 /// Notification for Profiles installed on the system.
