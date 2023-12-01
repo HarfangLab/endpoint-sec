@@ -347,6 +347,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_PETITION => NotifyAuthorizationPetition (EventAuthorizationPetition [_ => None] { raw: raw_event.authorization_petition.as_opt()?, version, }),
         /// Notification that a process had it's right petition judged
         ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_JUDGEMENT => NotifyAuthorizationJudgement (EventAuthorizationJudgement [_ => None] { raw: raw_event.authorization_judgement.as_opt()?, version, }),
+        /// Notification about a sudo event.
+        ES_EVENT_TYPE_NOTIFY_SUDO => NotifySudo (EventSudo [_ => None] { raw: raw_event.sudo.as_opt()?, }),
     }
 );
 
@@ -587,4 +589,5 @@ cfg_mod! {
     mod event_su;
     mod event_authorization_petition;
     mod event_authorization_judgement;
+    mod event_sudo;
 }
