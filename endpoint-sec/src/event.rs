@@ -349,6 +349,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_JUDGEMENT => NotifyAuthorizationJudgement (EventAuthorizationJudgement [_ => None] { raw: raw_event.authorization_judgement.as_opt()?, version, }),
         /// Notification about a sudo event.
         ES_EVENT_TYPE_NOTIFY_SUDO => NotifySudo (EventSudo [_ => None] { raw: raw_event.sudo.as_opt()?, }),
+        /// Notification about an OD group add event.
+        ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD => NotifyOdGroupAdd (EventOdGroupAdd [_ => None] { raw: raw_event.od_group_add.as_opt()?, version, }),
     }
 );
 
@@ -590,4 +592,5 @@ cfg_mod! {
     mod event_authorization_petition;
     mod event_authorization_judgement;
     mod event_sudo;
+    mod event_od_group_add;
 }
