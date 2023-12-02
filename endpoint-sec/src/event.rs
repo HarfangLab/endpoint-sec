@@ -353,6 +353,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD => NotifyOdGroupAdd (EventOdGroupAdd [_ => None] { raw: raw_event.od_group_add.as_opt()?, version, }),
         /// Notification about an OD group remove event.
         ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE => NotifyOdGroupRemove (EventOdGroupRemove [_ => None] { raw: raw_event.od_group_remove.as_opt()?, version, }),
+        /// Notification about a group that had its members initialised or replaced.
+        ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET => NotifyOdGroupSet (EventOdGroupSet [_ => None] { raw: raw_event.od_group_set.as_opt()?, version, }),
     }
 );
 
@@ -409,6 +411,7 @@ macro_rules! make_event_data_iterator {
         impl<'raw> std::iter::Iterator for $name<'_, 'raw> {
             type Item = $item;
 
+            #[allow(unused_unsafe)]
             fn next(&mut self) -> Option<Self::Item> {
                 if self.current < self.count {
                     // Safety: Safe as raw is a reference and therefore cannot be null
@@ -596,4 +599,5 @@ cfg_mod! {
     mod event_sudo;
     mod event_od_group_add;
     mod event_od_group_remove;
+    mod event_od_group_set;
 }
