@@ -2439,7 +2439,7 @@ pub struct es_event_od_group_set_t {
     /// The group to which members were set.
     pub group_name: es_string_token_t,
     /// Array of new members.
-    pub member: ShouldNotBeNull<es_od_member_id_t>,
+    pub members: ShouldNotBeNull<es_od_member_id_array_t>,
     /// OD node being mutated.
     ///
     /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
