@@ -20,23 +20,27 @@ pub struct EventOdGroupRemove<'a> {
 
 impl<'a> EventOdGroupRemove<'a> {
     /// Process that instigated operation (XPC caller).
+    #[inline(always)]
     pub fn instigator(&self) -> Process<'a> {
         // Safety: 'a tied to self, object obtained through ES
         Process::new(unsafe { self.raw.instigator.as_ref() }, self.version)
     }
 
     /// Result code for the operation.
+    #[inline(always)]
     pub fn error_code(&self) -> i32 {
         self.raw.error_code
     }
 
     /// The group to which the member was removed.
+    #[inline(always)]
     pub fn group_name(&self) -> &'a OsStr {
         // Safety: 'a tied to self, object obtained through ES
         unsafe { self.raw.group_name.as_os_str() }
     }
 
     /// The identity of the member removed.
+    #[inline(always)]
     pub fn member(&self) -> OdMemberId<'a> {
         OdMemberId {
             // Safety: 'a tied to self, object obtained through ES
@@ -47,6 +51,7 @@ impl<'a> EventOdGroupRemove<'a> {
     /// OD node being mutated.
     ///
     /// Typically one of "/Local/Default", "/LDAPv3/<server>" or "/Active Directory/<domain>".
+    #[inline(always)]
     pub fn node_name(&self) -> &'a OsStr {
         // Safety: 'a tied to self, object obtained through ES
         unsafe { self.raw.node_name.as_os_str() }
@@ -54,6 +59,7 @@ impl<'a> EventOdGroupRemove<'a> {
 
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
+    #[inline(always)]
     pub fn db_path(&self) -> Option<&'a OsStr> {
         if self.node_name() == OsStr::new("/Local/Default") {
             // Safety: 'a tied to self, object obtained through ES
