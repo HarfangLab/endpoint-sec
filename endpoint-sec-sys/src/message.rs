@@ -2375,8 +2375,8 @@ should_not_be_null_fields!(es_event_od_group_add_t; instigator -> es_process_t);
 ///
 /// This event type does not support caching (notify-only).
 ///
-/// This event does not indicate that a member was actually removed. For example when removing a user
-/// to a group they are already a member of.
+/// This event does not indicate that a member was actually removed. For example when removing a
+/// user from a group they are not a member of.
 #[cfg(feature = "macos_14_0_0")]
 #[repr(C)]
 pub struct es_event_od_group_remove_t {
