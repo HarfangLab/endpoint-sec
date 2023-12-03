@@ -355,6 +355,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE => NotifyOdGroupRemove (EventOdGroupRemove [_ => None] { raw: raw_event.od_group_remove.as_opt()?, version, }),
         /// Notification about a group that had its members initialised or replaced.
         ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET => NotifyOdGroupSet (EventOdGroupSet [_ => None] { raw: raw_event.od_group_set.as_opt()?, version, }),
+        /// Notification about a account that had its password modified.
+        ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD => NotifyOdModifyPassword (EventOdModifyPassword [_ => None] { raw: raw_event.od_modify_password.as_opt()?, version, }),
     }
 );
 
@@ -600,4 +602,5 @@ cfg_mod! {
     mod event_od_group_add;
     mod event_od_group_remove;
     mod event_od_group_set;
+    mod event_od_modify_password;
 }
