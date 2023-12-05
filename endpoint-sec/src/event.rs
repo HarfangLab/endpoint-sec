@@ -361,6 +361,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER => NotifyOdDisableUser (EventOdDisableUser [_ => None] { raw: raw_event.od_disable_user.as_opt()?, version, }),
         /// Notification about a user account that was enabled.
         ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER => NotifyOdEnableUser (EventOdEnableUser [_ => None] { raw: raw_event.od_enable_user.as_opt()?, version, }),
+        /// Notification about an attribute value that was added to a record.
+        ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD => NotifyOdAttributeValueAdd (EventOdAttributeValueAdd [_ => None] { raw: raw_event.od_attribute_value_add.as_opt()?, version, }),
     }
 );
 
@@ -609,4 +611,5 @@ cfg_mod! {
     mod event_od_modify_password;
     mod event_od_disable_user;
     mod event_od_enable_user;
+    mod event_od_attribute_value_add;
 }
