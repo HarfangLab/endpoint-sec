@@ -369,6 +369,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET => NotifyOdAttributeSet (EventOdAttributeSet [_ => None] { raw: raw_event.od_attribute_set.as_opt()?, version, }),
         /// Notification about an account that was created.
         ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER => NotifyOdCreateUser (EventOdCreateUser [_ => None] { raw: raw_event.od_create_user.as_opt()?, version, }),
+        /// Notification about a group that was created.
+        ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP => NotifyOdCreateGroup (EventOdCreateGroup [_ => None] { raw: raw_event.od_create_group.as_opt()?, version, }),
     }
 );
 
@@ -621,4 +623,5 @@ cfg_mod! {
     mod event_od_attribute_value_remove;
     mod event_od_attribute_set;
     mod event_od_create_user;
+    mod event_od_create_group;
 }
