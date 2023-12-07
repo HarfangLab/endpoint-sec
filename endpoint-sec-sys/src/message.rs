@@ -2753,6 +2753,7 @@ should_not_be_null_fields!(es_event_od_delete_group_t; instigator -> es_process_
 pub struct es_event_xpc_connect_t {
     /// Service name of the named service.
     pub service_name: es_string_token_t,
+    /// The type of XPC domain in which the service resides in.
     pub service_domain_type: es_xpc_domain_type_t,
 }
 
