@@ -375,6 +375,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER => NotifyOdDeleteUser (EventOdDeleteUser [_ => None] { raw: raw_event.od_delete_user.as_opt()?, version, }),
         /// Notification about a group that was deleted.
         ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP => NotifyOdDeleteGroup (EventOdDeleteGroup [_ => None] { raw: raw_event.od_delete_group.as_opt()?, version, }),
+        /// Notification for an XPC connection being established to a named service.
+        ES_EVENT_TYPE_NOTIFY_XPC_CONNECT => NotifyXpcConnect (EventXpcConnect [_ => None] { raw: raw_event.xpc_connect.as_opt()?, }),
     }
 );
 
@@ -630,4 +632,5 @@ cfg_mod! {
     mod event_od_create_group;
     mod event_od_delete_user;
     mod event_od_delete_group;
+    mod event_xpc_connect;
 }
