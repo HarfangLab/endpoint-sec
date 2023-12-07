@@ -365,6 +365,8 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD => NotifyOdAttributeValueAdd (EventOdAttributeValueAdd [_ => None] { raw: raw_event.od_attribute_value_add.as_opt()?, version, }),
         /// Notification about an attribute value that was removed from a record.
         ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE => NotifyOdAttributeValueRemove (EventOdAttributeValueRemove [_ => None] { raw: raw_event.od_attribute_value_remove.as_opt()?, version, }),
+        /// Notification about an attribute that was set.
+        ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET => NotifyOdAttributeSet (EventOdAttributeSet [_ => None] { raw: raw_event.od_attribute_set.as_opt()?, version, }),
     }
 );
 
@@ -615,4 +617,5 @@ cfg_mod! {
     mod event_od_enable_user;
     mod event_od_attribute_value_add;
     mod event_od_attribute_value_remove;
+    mod event_od_attribute_set;
 }
