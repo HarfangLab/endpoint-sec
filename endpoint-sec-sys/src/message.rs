@@ -2139,7 +2139,7 @@ pub struct es_event_su_t {
     /// The uid of the user who initiated the su
     pub from_uid: uid_t,
     /// The name of the user who initiated the su
-    pub from_name: es_string_token_t,
+    pub from_username: es_string_token_t,
     /// True iff su was successful, Describes whether or not the to_uid is interpretable
     pub has_to_uid: bool,
     /// Optional. If success, the user ID that is going to be substituted

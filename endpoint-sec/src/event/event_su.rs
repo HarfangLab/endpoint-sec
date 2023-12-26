@@ -37,9 +37,9 @@ impl<'a> EventSu<'a> {
 
     /// The name of the user who initiated the su.
     #[inline(always)]
-    pub fn from_name(&self) -> &'a OsStr {
+    pub fn from_username(&self) -> &'a OsStr {
         // Safety: lifetime matches that of message
-        unsafe { self.raw.from_name.as_os_str() }
+        unsafe { self.raw.from_username.as_os_str() }
     }
 
     /// True iff su was successful, Describes whether or not the to_uid is interpretable
@@ -109,7 +109,7 @@ impl<'a> EventSu<'a> {
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventSu<'_> {}
 
-impl_debug_eq_hash_with_functions!(EventSu<'a>; success, failure_message, from_uid, from_name, to_uid, to_username, shell, arg_count, env_count);
+impl_debug_eq_hash_with_functions!(EventSu<'a>; success, failure_message, from_uid, from_username, to_uid, to_username, shell, arg_count, env_count);
 
 /// Read the `idx` arg of `raw`
 ///
