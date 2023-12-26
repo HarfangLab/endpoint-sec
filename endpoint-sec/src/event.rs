@@ -500,6 +500,9 @@ macro_rules! make_event_data_iterator {
 
 /// Wrapper for the `.as_ref()` call on `es_string_token_t` with lifetime extension.
 ///
+/// This is **only** intended for `make_event_data_iterator!`, which ensures lifetimes are correctly
+/// bound to avoid use-after-free shenanigans.
+///
 /// # Safety
 ///
 /// This is a horrible horrible hack. Apple documents that the `es_string_token_t` returned by
