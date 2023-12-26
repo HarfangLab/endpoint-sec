@@ -449,6 +449,15 @@ macro_rules! make_event_data_iterator {
 
             #[inline(always)]
             fn nth(&mut self, n: usize) -> Option<Self::Item> {
+                // Overflow: the only `count_ty` used are u32 and usize. Since Apple machines are
+                // always 64-bits now (or more in the future, but that's still not a problem) it
+                // works out okay:
+                //
+                // - usize: the line does not change anything: `self.current = n`
+                // - u32: if `n > u32::MAX` is true, we clamp to `u32::MAX` to avoid something like
+                //   `.nth((u32::MAX + 1) as usize)` yielding `0` because of the truncation of
+                //   `as $count_ty`. Since the check in `.next()` is `<`, not `<=`, this will always
+                //   return `None` in that case and work correctly for valid `n`s.
                 self.current = n.min(<$count_ty>::MAX as usize) as $count_ty;
                 self.next()
             }
