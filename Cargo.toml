@@ -1,5 +1,5 @@
 [workspace.package]
-version = "0.3.2"
+version = "0.3.3"
 authors = ["HarfangLab Rust Team"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
@@ -12,8 +12,8 @@ resolver = "2"
 
 [workspace.dependencies]
 # In workspace
-endpoint-sec = { version = "0.3.1", path = "./endpoint-sec" }
-endpoint-sec-sys = { version = "0.3.1", path = "./endpoint-sec-sys" }
+endpoint-sec = { version = "0.3.3", path = "./endpoint-sec" }
+endpoint-sec-sys = { version = "0.3.3", path = "./endpoint-sec-sys" }
 
 # External - Required
 block2 = "0.3"
