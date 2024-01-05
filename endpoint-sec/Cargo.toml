@@ -22,6 +22,8 @@ default = []
 audit_token_from_pid = []
 
 # Updated to the maximum version each time a new one is introduced
+#
+# When adding a new max version, remember to update the CI to test it too.
 max = ["macos_14_0_0"]
 
 macos_14_0_0 = ["macos_13_3_0", "endpoint-sec-sys/macos_14_0_0"]
