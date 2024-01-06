@@ -42,7 +42,7 @@ impl<'a> EventLoginLogin<'a> {
     #[inline(always)]
     pub fn uid(&self) -> Option<uid_t> {
         // Safety: access is gated on documented conditions
-        self.has_uid().then_some(unsafe { self.raw.anon0.uid })
+        self.has_uid().then(|| unsafe { self.raw.anon0.uid })
     }
 }
 

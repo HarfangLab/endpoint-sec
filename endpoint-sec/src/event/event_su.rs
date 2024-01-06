@@ -52,7 +52,7 @@ impl<'a> EventSu<'a> {
     #[inline(always)]
     pub fn to_uid(&self) -> Option<uid_t> {
         // Safety: checked for success and `has_to_uid`
-        (self.success() && self.has_to_uid()).then_some(unsafe { self.raw.to_uid.uid })
+        (self.success() && self.has_to_uid()).then(|| unsafe { self.raw.to_uid.uid })
     }
 
     /// If success, the user name that is going to be substituted
