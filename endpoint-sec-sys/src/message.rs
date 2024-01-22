@@ -3100,7 +3100,6 @@ pub struct es_message_t {
     /// See `global_seq_num`.
     ///
     /// Field available only if message version >= 2.
-    #[cfg(feature = "macos_10_15_1")]
     pub seq_num: u64,
     /// Indicates if the action field is an auth or notify action
     pub action_type: es_action_type_t,
