@@ -1,5 +1,5 @@
 # Build image
-image: macos-monterey
+image: macos-sonoma
 
 install:
 # Install rustup

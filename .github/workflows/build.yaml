@@ -158,7 +158,7 @@ jobs:
         - { version: "11", feature: macos_11_3_0 }
         - { version: "12", feature: macos_12_0_0 }
         - { version: "13", feature: macos_13_3_0 }
-        - { version: "13", feature: macos_14_0_0 } # no macOS 14 runner for github yet
+        - { version: "14", feature: macos_14_0_0 }
 
     steps:
       - name: checkout sources
