@@ -42,6 +42,7 @@ impl<'a> EventLoginLogin<'a> {
     #[inline(always)]
     pub fn uid(&self) -> Option<uid_t> {
         // Safety: access is gated on documented conditions
+        #[allow(clippy::unnecessary_lazy_evaluations)]
         self.has_uid().then(|| unsafe { self.raw.anon0.uid })
     }
 }

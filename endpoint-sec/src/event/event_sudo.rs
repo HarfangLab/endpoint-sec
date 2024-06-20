@@ -39,6 +39,7 @@ impl<'a> EventSudo<'a> {
     #[inline(always)]
     pub fn from_uid(&self) -> Option<uid_t> {
         // Safety: 'a tied to self, object obtained through ES
+        #[allow(clippy::unnecessary_lazy_evaluations)]
         self.has_from_uid().then(|| unsafe { self.raw.from_uid.uid })
     }
     /// Optional. The name of the user who initiated the su
@@ -59,6 +60,7 @@ impl<'a> EventSudo<'a> {
             return None;
         }
         // Safety: 'a tied to self, object obtained through ES
+        #[allow(clippy::unnecessary_lazy_evaluations)]
         self.has_to_uid().then(|| unsafe { self.raw.to_uid.uid })
     }
     /// Optional. If success, the user name that is going to be substituted

@@ -52,6 +52,7 @@ impl<'a> EventSu<'a> {
     #[inline(always)]
     pub fn to_uid(&self) -> Option<uid_t> {
         // Safety: checked for success and `has_to_uid`
+        #[allow(clippy::unnecessary_lazy_evaluations)]
         (self.success() && self.has_to_uid()).then(|| unsafe { self.raw.to_uid.uid })
     }
 
