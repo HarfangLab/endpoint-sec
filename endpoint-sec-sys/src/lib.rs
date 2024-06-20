@@ -42,7 +42,7 @@
     rustdoc::broken_intra_doc_links
 )]
 
-use core::fmt;
+use core::{fmt, ptr};
 
 /// A wrapper type around `*mut T` to communicate a pointer should not be null without introducing
 /// undefined behaviour.
@@ -125,7 +125,7 @@ impl<T: ?Sized> Eq for ShouldNotBeNull<T> {}
 impl<T: ?Sized> PartialEq for ShouldNotBeNull<T> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.as_ptr() == other.as_ptr()
+        ptr::eq(self.as_ptr(), other.as_ptr())
     }
 }
 

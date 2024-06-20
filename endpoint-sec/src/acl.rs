@@ -10,7 +10,7 @@ use endpoint_sec_sys::{_acl, acl_t};
 // TODO: correctly implement Debug/Eq/Hash for ACLs
 #[doc(alias = "acl_t")]
 #[doc(alias = "_acl")]
-pub struct Acl<'a>(&'a _acl);
+pub struct Acl<'a>(#[allow(unused)] &'a _acl);
 
 impl<'a> Acl<'a> {
     /// Builds an ACL wrapper from the raw one.

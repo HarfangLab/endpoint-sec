@@ -62,7 +62,9 @@ jobs:
             --all-targets \
             --target x86_64-apple-darwin \
             --target aarch64-apple-darwin \
-            --features ${{ matrix.feature }}
+            --features ${{ matrix.feature }} \
+            -- \
+            -D warnings
 
   clippy-all-features:
     name: Clippy - all features (${{ matrix.version.name }})
@@ -101,7 +103,9 @@ jobs:
             --all-targets \
             --target x86_64-apple-darwin \
             --target aarch64-apple-darwin \
-            --all-features
+            --all-features \
+            -- \
+            -D warnings
 
   build-all-features:
     name: Build - all features (${{ matrix.version.name }})
