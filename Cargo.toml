@@ -4,7 +4,7 @@ authors = ["HarfangLab Rust Team"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
 repository = "https://github.com/HarfangLab/endpoint-sec"
-rust-version = "1.65"
+rust-version = "1.70"
 
 [workspace]
 members = ["endpoint-sec/", "endpoint-sec-sys/"]
