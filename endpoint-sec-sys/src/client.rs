@@ -604,7 +604,7 @@ extern "C" {
 ///  "respond" functions
 /// - The `es_message_t` is the message that must be handled. Mutating it is forbidden but Rust
 ///  does not expose a `ConstNonNull` type.
-pub type es_handler_block_t = Block<(NonNull<es_client_t>, NonNull<es_message_t>), ()>;
+pub type es_handler_block_t<'f> = Block<dyn Fn(NonNull<es_client_t>, NonNull<es_message_t>) + 'f>;
 
 #[link(name = "EndpointSecurity", kind = "dylib")]
 extern "C" {
