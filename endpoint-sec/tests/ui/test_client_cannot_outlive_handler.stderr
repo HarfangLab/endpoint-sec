@@ -4,6 +4,7 @@ error[E0597]: `v` does not live long enough
 4  |     let mut client = {
    |         ---------- borrow later stored here
 5  |         let v = vec![1, 2, 3];
+   |             - binding `v` declared here
 6  |         let handler = |_: &mut Client<'_>, _| {
    |                       ----------------------- value captured here
 7  |             dbg!(&v);
