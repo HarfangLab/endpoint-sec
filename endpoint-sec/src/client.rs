@@ -102,7 +102,7 @@ impl Client<'_> {
     {
         let mut client = std::ptr::null_mut();
 
-        let block_handler = block2::ConcreteBlock::new(
+        let block_handler = block2::RcBlock::new(
             move |client: NonNull<es_client_t>, message: NonNull<es_message_t>| {
                 let _err = catch_unwind(|| {
                     // Safety: Apple guarantees the received message is non-null and valid
@@ -119,28 +119,18 @@ impl Client<'_> {
             },
         );
 
-        // Forget the block_handler. es_new_client takes ownership of the Block
-        // by calling Block_copy on it. It does so, even in the case of an
-        // error.
-        //
-        // However, because what we pass to it is a ConcreteBlock (and not an
-        // RcBlock or w.e.), this copy will _not_ be a deep copy - it will
-        // simply `memmove` the closure's struct into a new memory location.
-        //
-        // In a sense, this is similar to doing `Box::new(a)` - the struct a
-        // will be copied to the heap, but all of the pointers contained within
-        // the struct will still have the old value. Because of this, when we do
-        // Box::new(a), we avoid running a's destructor.
-        //
-        // Similarly, here, we gave block_handler to es_new_client, who copied
-        // its struct to its own internal storage. We must now explicitly avoid
-        // calling block_handler's destructor to ensure the objects contained
-        // within stay alive.
-        let block_handler = std::mem::ManuallyDrop::new(block_handler);
-
         // Safety:
-        // - `handler` is 'b so we can keep a ref through it in `block_handler` without trouble
-        // - The result is checked with `.ok()` below
+        // - `handler` is 'b so we can keep a ref through it in `block_handler`
+        //   without trouble.
+        // - `block_handler` is passed as an `RcBlock`, so `es_new_client`'s
+        //   taking ownership of it through `_Block_copy` will simply increment
+        //   its reference count instead of copying its stack bits, meaning our
+        //   dropping it below will not actually release it, but simply
+        //   decrement its RC and let it live until the ES runtime drops it
+        //   itself, finally reaching an RC of 0 and therefore actually
+        //   releasing it from memory, which should only happen when we
+        //   explicitly release the client in our `Drop` implementation.
+        // - The result is checked with `.ok()` below.
         unsafe { es_new_client(&mut client, &block_handler) }.ok()?;
 
         // Safety: Apple guarantees the received client is non-null and valid since we have checked
