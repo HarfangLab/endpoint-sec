@@ -199,7 +199,7 @@ extern "C" {
     ///
     /// - `client`: The es_client_t for which the muted processes will be retrieved.
     /// - `muted_processes`: OUT param the will contain newly created memory describing the set of
-    ///  muted processes. This memory must be deleted using [`es_release_muted_processes`].
+    ///   muted processes. This memory must be deleted using [`es_release_muted_processes`].
     ///
     /// See [`es_release_muted_processes()`]
     #[cfg(feature = "macos_12_0_0")]
@@ -462,7 +462,7 @@ extern "C" {
     ///
     /// - `client`: The es_client_t for which the muted paths will be retrieved.
     /// - `muted_paths`: OUT param the will contain newly created memory describing the set of
-    ///  muted paths. This memory must be deleted using [`es_release_muted_paths()`].
+    ///   muted paths. This memory must be deleted using [`es_release_muted_paths()`].
     ///
     /// See [`es_release_muted_paths()`]
     #[cfg(feature = "macos_12_0_0")]
@@ -601,9 +601,9 @@ extern "C" {
 /// The type of block that will be invoked to handled messages from the ES subsystem
 ///
 /// - The `es_client_t` is a handle to the client being sent the event. It must be passed to any
-///  "respond" functions
+///   "respond" functions
 /// - The `es_message_t` is the message that must be handled. Mutating it is forbidden but Rust
-///  does not expose a `ConstNonNull` type.
+///   does not expose a `ConstNonNull` type.
 pub type es_handler_block_t<'f> = Block<dyn Fn(NonNull<es_client_t>, NonNull<es_message_t>) + 'f>;
 
 #[link(name = "EndpointSecurity", kind = "dylib")]

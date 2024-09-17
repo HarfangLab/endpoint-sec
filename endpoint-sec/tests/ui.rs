@@ -1,7 +1,7 @@
 //! Dummy libary used to separate trybuild since it is causing spurious recompilations because we change
 //! the binaries by signing them.
 
-#[cfg(all(test, not(feature = "test_trybuild_deactivate")))]
+#[cfg(test)]
 mod tests {
     #[test]
     fn test_trybuild_client_ui() {

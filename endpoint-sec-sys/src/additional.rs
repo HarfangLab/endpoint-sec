@@ -123,16 +123,16 @@ extern "C" {
     /// - `atoken`: the audit token containing the desired information
     /// - `auidp`: Pointer to a `uid_t`; on return will be set to the task or sender's audit user ID
     /// - `euidp`: Pointer to a `uid_t`; on return will be set to the task or sender's effective
-    ///  user ID
+    ///   user ID
     /// - `egidp`: Pointer to a `gid_t`; on return will be set to the task or sender's effective
-    ///  group ID
+    ///   group ID
     /// - `ruidp`: Pointer to a `uid_t`; on return will be set to the task or sender's real user ID
     /// - `rgidp`: Pointer to a `gid_t`; on return will be set to the task or sender's real group ID
     /// - `pidp`: Pointer to a `pid_t`; on return will be set to the task or sender's process ID
     /// - `asidp`: Pointer to an `au_asid_t`; on return will be set to the task or sender's audit
-    /// session ID
+    ///   session ID
     /// - `tidp`: Pointer to an `au_tid_t`; on return will be set to the process ID version and NOT
-    ///  THE SENDER'S TERMINAL ID.
+    ///   THE SENDER'S TERMINAL ID.
     ///
     /// IMPORTANT: In Apple's `bsm-8`, these are marked `__APPLE_API_PRIVATE`.
     pub fn audit_token_to_au32(
