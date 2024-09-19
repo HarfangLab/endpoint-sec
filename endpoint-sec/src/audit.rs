@@ -10,6 +10,7 @@ use endpoint_sec_sys::{
 /// A wrapper around an [`audit_token_t`].
 #[derive(Clone, Copy)]
 #[doc(alias = "audit_token_t")]
+#[repr(transparent)]
 pub struct AuditToken(pub audit_token_t);
 
 impl fmt::LowerHex for AuditToken {
