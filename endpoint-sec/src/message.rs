@@ -28,6 +28,7 @@ use crate::{utils, Action, ActionResult, AuditToken, Event};
 ///
 /// See <https://developer.apple.com/documentation/endpointsecurity/3366178-es_free_message>.
 #[doc(alias = "es_message_t")]
+#[repr(transparent)]
 pub struct Message(NonNull<es_message_t>);
 
 impl Message {
