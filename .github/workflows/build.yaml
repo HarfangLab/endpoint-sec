@@ -113,7 +113,7 @@ jobs:
     strategy:
       matrix:
         version:
-        - { name: MSRV, value: "1.70.0" }
+        - { name: MSRV, value: "1.71.0" }
         - { name: Stable, value: stable }
 
     steps:
@@ -153,7 +153,7 @@ jobs:
       matrix:
         version:
         # Only build older macOS on the MSRV, since that's the likely use case
-        - { name: MSRV, value: "1.70.0" }
+        - { name: MSRV, value: "1.71.0" }
         os:
         # There are no 10.15, 11.3, nor 12 runners anymore.
         # To avoid reaching the Github Actions limits, we only test for the
