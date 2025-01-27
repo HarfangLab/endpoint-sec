@@ -9,7 +9,7 @@ pub struct EventSetregid<'a> {
     pub(crate) raw: &'a es_event_setregid_t,
 }
 
-impl<'a> EventSetregid<'a> {
+impl EventSetregid<'_> {
     /// `egid` argument to the `setregid()` call.
     #[inline(always)]
     pub fn egid(&self) -> uid_t {

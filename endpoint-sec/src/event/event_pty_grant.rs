@@ -9,7 +9,7 @@ pub struct EventPtyGrant<'a> {
     pub(crate) raw: &'a es_event_pty_grant_t,
 }
 
-impl<'a> EventPtyGrant<'a> {
+impl EventPtyGrant<'_> {
     /// Major and minor numbers of device.
     #[inline(always)]
     pub fn dev(&self) -> dev_t {

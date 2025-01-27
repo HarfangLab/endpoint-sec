@@ -211,7 +211,7 @@ impl_debug_eq_hash_with_functions!(EventExec<'a> with version;
 );
 
 #[cfg(feature = "macos_11_0_0")]
-impl<'a> Fd<'a> {
+impl Fd<'_> {
     /// File descriptor number
     #[inline(always)]
     pub fn fd(&self) -> i32 {

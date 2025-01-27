@@ -9,7 +9,7 @@ pub struct EventSetegid<'a> {
     pub(crate) raw: &'a es_event_setegid_t,
 }
 
-impl<'a> EventSetegid<'a> {
+impl EventSetegid<'_> {
     /// Argument to the `setegid()` call.
     #[inline(always)]
     pub fn egid(&self) -> uid_t {
