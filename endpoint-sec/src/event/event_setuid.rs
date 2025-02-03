@@ -9,7 +9,7 @@ pub struct EventSetuid<'a> {
     pub(crate) raw: &'a es_event_setuid_t,
 }
 
-impl<'a> EventSetuid<'a> {
+impl EventSetuid<'_> {
     /// Argument to the `setuid()` call.
     #[inline(always)]
     pub fn uid(&self) -> uid_t {

@@ -9,7 +9,7 @@ pub struct EventMprotect<'a> {
     pub(crate) raw: &'a es_event_mprotect_t,
 }
 
-impl<'a> EventMprotect<'a> {
+impl EventMprotect<'_> {
     ///  The desired new protection value.
     #[inline(always)]
     pub fn protection(&self) -> i32 {

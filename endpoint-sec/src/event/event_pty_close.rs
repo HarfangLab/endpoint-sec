@@ -9,7 +9,7 @@ pub struct EventPtyClose<'a> {
     pub(crate) raw: &'a es_event_pty_close_t,
 }
 
-impl<'a> EventPtyClose<'a> {
+impl EventPtyClose<'_> {
     /// Major and minor numbers of device.
     #[inline(always)]
     pub fn dev(&self) -> dev_t {

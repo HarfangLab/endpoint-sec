@@ -9,7 +9,7 @@ pub struct EventExit<'a> {
     pub(crate) raw: &'a es_event_exit_t,
 }
 
-impl<'a> EventExit<'a> {
+impl EventExit<'_> {
     /// The exit status of a process.
     #[inline(always)]
     pub fn stat(&self) -> i32 {

@@ -12,7 +12,7 @@ use endpoint_sec_sys::{_acl, acl_t};
 #[doc(alias = "_acl")]
 pub struct Acl<'a>(#[allow(unused)] &'a _acl);
 
-impl<'a> Acl<'a> {
+impl Acl<'_> {
     /// Builds an ACL wrapper from the raw one.
     ///
     /// `None` if the given ACL is NULL inside.
