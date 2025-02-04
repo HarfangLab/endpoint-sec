@@ -54,29 +54,13 @@ impl AuditToken {
     /// [method]: https://developer.apple.com/forums/thread/652363
     #[cfg(feature = "audit_token_from_pid")]
     pub fn from_pid(pid: pid_t) -> Option<Self> {
-        use mach2::kern_return::kern_return_t;
-        use mach2::vm_types::natural_t;
-
-        /// Task port name
-        #[allow(non_camel_case_types)]
-        type mach_port_name_t = natural_t;
-
-        extern "C" {
-            // Absent in both libc and mach2
-            fn task_name_for_pid(
-                target_tport: mach_port_name_t,
-                pid: pid_t,
-                task_name: &mut mach_port_name_t,
-            ) -> kern_return_t;
-        }
-
         let mut task_name = Default::default();
         // Safety:
         // - `mach_task_self` will always succeed
         // - `task_name` is mutable and of the correct type so the reference is aligned and points
         //   to initialized memory
         // - result is checked below
-        let res = unsafe { task_name_for_pid(libc::mach_task_self(), pid, &mut task_name) };
+        let res = unsafe { mach2::traps::task_for_pid(mach2::traps::mach_task_self(), pid, &mut task_name) };
         if res != libc::KERN_SUCCESS {
             return None;
         }
