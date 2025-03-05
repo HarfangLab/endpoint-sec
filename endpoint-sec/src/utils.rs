@@ -58,7 +58,7 @@ fn mti_from_u64(raw_info: u64) -> mach_timebase_info {
 
 /// [`mach_timebase_info`][struct@mach_timebase_info] to [`u64`]
 fn u64_from_mti(info: mach_timebase_info) -> u64 {
-    u64::from(info.denom) << 32 | u64::from(info.numer)
+    (u64::from(info.denom) << 32) | u64::from(info.numer)
 }
 
 /// Convert a [`endpoint_sec_sys::timespec`] to a [`Duration`].
