@@ -72,5 +72,7 @@ impl<'a> EventOdGroupRemove<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventOdGroupRemove<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventOdGroupRemove<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventOdGroupRemove<'a> with version; instigator, error_code, group_name, member, node_name, db_path);

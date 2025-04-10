@@ -38,5 +38,7 @@ impl<'a> EventLink<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventLink<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventLink<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventLink<'a>; source, target_dir, target_filename);

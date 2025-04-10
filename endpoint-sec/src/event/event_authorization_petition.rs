@@ -54,6 +54,8 @@ impl<'a> EventAuthorizationPetition<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventAuthorizationPetition<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventAuthorizationPetition<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventAuthorizationPetition<'a> with version; instigator, petitioner, flags, right_count);
 

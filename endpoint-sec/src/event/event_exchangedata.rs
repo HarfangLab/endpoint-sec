@@ -29,5 +29,7 @@ impl<'a> EventExchangeData<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventExchangeData<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventExchangeData<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventExchangeData<'a>; file1, file2);

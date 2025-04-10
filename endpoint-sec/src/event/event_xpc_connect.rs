@@ -28,5 +28,7 @@ impl<'a> EventXpcConnect<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventXpcConnect<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventXpcConnect<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventXpcConnect<'a>; service_name, service_domain_type);

@@ -33,5 +33,7 @@ impl<'a> EventProfileRemove<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventProfileRemove<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventProfileRemove<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventProfileRemove<'a> with version; instigator, profile);

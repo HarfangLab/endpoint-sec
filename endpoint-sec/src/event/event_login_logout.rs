@@ -26,7 +26,9 @@ impl<'a> EventLoginLogout<'a> {
     }
 }
 
-// Safety: safe to send acrosss threads: does not contain any interior mutability nor depend on current thread state
+// Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventLoginLogout<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventLoginLogout<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventLoginLogout<'a>; username, uid);

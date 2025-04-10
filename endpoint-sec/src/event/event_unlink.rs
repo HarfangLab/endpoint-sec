@@ -29,5 +29,7 @@ impl<'a> EventUnlink<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventUnlink<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventUnlink<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventUnlink<'a>; target, parent_dir);

@@ -31,5 +31,7 @@ impl<'a> EventRemoteThreadCreate<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventRemoteThreadCreate<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventRemoteThreadCreate<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventRemoteThreadCreate<'a> with version; target, thread_state);

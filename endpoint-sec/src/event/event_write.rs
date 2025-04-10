@@ -22,5 +22,7 @@ impl<'a> EventWrite<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventWrite<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventWrite<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventWrite<'a>; target);

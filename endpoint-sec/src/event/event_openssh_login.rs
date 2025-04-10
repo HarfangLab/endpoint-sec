@@ -4,9 +4,7 @@ use std::ffi::OsStr;
 use std::net::IpAddr;
 use std::str::FromStr;
 
-use endpoint_sec_sys::{
-    es_address_type_t, es_event_openssh_login_t, es_openssh_login_result_type_t, uid_t,
-};
+use endpoint_sec_sys::{es_address_type_t, es_event_openssh_login_t, es_openssh_login_result_type_t, uid_t};
 
 /// OpenSSH login event.
 #[doc(alias = "es_event_openssh_login_t")]
@@ -70,8 +68,10 @@ impl<'a> EventOpensshLogin<'a> {
     }
 }
 
-// Safety: safe to send acrosss threads: does not contain any interior mutability nor depend on current thread state
+// Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventOpensshLogin<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventOpensshLogin<'_> {}
 
 impl_debug_eq_hash_with_functions!(
     EventOpensshLogin<'a>;

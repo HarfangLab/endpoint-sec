@@ -31,5 +31,7 @@ impl<'a> EventDeleteExtAttr<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventDeleteExtAttr<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventDeleteExtAttr<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventDeleteExtAttr<'a>; extattr, target);

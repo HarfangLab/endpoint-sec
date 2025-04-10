@@ -39,5 +39,7 @@ impl<'a> EventFileProviderMaterialize<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventFileProviderMaterialize<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventFileProviderMaterialize<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventFileProviderMaterialize<'a> with version; instigator, source, target);

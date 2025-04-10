@@ -109,6 +109,8 @@ impl<'a> EventSu<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventSu<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventSu<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventSu<'a>; success, failure_message, from_uid, from_username, to_uid, to_username, shell, arg_count, env_count);
 
