@@ -40,5 +40,7 @@ impl<'a> EventUipcConnect<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventUipcConnect<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventUipcConnect<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventUipcConnect<'a>; file, domain, type_, protocol);

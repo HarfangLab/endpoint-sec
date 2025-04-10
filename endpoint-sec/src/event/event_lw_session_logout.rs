@@ -28,5 +28,7 @@ impl<'a> EventLwSessionLogout<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventLwSessionLogout<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventLwSessionLogout<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventLwSessionLogout<'a>; username, graphical_session_id);

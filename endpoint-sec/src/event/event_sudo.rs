@@ -82,6 +82,8 @@ impl<'a> EventSudo<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventSudo<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventSudo<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventSudo<'a>; success, reject_info, has_from_uid, from_uid, from_username, has_to_uid, to_uid, to_username, command);
 

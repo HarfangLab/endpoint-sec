@@ -77,5 +77,7 @@ impl<'a> EventCreate<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventCreate<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventCreate<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventCreate<'a> with version; destination, #[cfg(feature = "macos_10_15_1")] acl);

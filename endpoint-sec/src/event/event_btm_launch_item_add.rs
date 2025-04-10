@@ -2,9 +2,7 @@
 
 use std::ffi::OsStr;
 
-use endpoint_sec_sys::{
-    es_btm_item_type_t, es_btm_launch_item_t, es_event_btm_launch_item_add_t, uid_t,
-};
+use endpoint_sec_sys::{es_btm_item_type_t, es_btm_launch_item_t, es_event_btm_launch_item_add_t, uid_t};
 
 use crate::Process;
 
@@ -53,6 +51,8 @@ impl<'a> EventBtmLaunchItemAdd<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventBtmLaunchItemAdd<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventBtmLaunchItemAdd<'_> {}
 
 impl_debug_eq_hash_with_functions!(
     EventBtmLaunchItemAdd<'a>;

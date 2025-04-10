@@ -66,5 +66,7 @@ impl<'a> EventOdModifyPassword<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventOdModifyPassword<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventOdModifyPassword<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventOdModifyPassword<'a> with version; instigator, error_code, account_type, account_name, node_name, db_path);

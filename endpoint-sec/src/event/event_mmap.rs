@@ -46,5 +46,7 @@ impl<'a> EventMmap<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventMmap<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventMmap<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventMmap<'a>; protection, max_protection, flags, file_pos, source);

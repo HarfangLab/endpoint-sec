@@ -25,5 +25,7 @@ impl<'a> EventTrace<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventTrace<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventTrace<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventTrace<'a> with version; target);

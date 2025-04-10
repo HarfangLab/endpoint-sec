@@ -41,6 +41,8 @@ impl<'a> EventProfileAdd<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventProfileAdd<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventProfileAdd<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventProfileAdd<'a> with version; instigator, is_update, profile);
 

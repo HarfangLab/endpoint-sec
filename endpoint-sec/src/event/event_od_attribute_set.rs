@@ -91,6 +91,8 @@ impl<'a> EventOdAttributeSet<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventOdAttributeSet<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventOdAttributeSet<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventOdAttributeSet<'a> with version; instigator, error_code, record_type, record_name, attribute_name, attribute_value_count, node_name, db_path);
 

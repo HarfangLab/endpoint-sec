@@ -22,5 +22,7 @@ impl<'a> EventListExtAttr<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventListExtAttr<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventListExtAttr<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventListExtAttr<'a>; target);

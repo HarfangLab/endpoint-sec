@@ -60,5 +60,7 @@ impl<'a> EventOdDisableUser<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventOdDisableUser<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventOdDisableUser<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventOdDisableUser<'a> with version; instigator, error_code, user_name, node_name, db_path);

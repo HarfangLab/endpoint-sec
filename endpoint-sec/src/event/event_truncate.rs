@@ -22,5 +22,7 @@ impl<'a> EventTruncate<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventTruncate<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventTruncate<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventTruncate<'a>; target);

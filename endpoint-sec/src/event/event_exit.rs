@@ -19,5 +19,7 @@ impl EventExit<'_> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventExit<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventExit<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventExit<'a>; stat);

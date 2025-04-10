@@ -28,5 +28,7 @@ impl<'a> EventSetAttrlist<'a> {
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventSetAttrlist<'_> {}
+// Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
+unsafe impl Sync for EventSetAttrlist<'_> {}
 
 impl_debug_eq_hash_with_functions!(EventSetAttrlist<'a>; attrlist, target);
