@@ -81,11 +81,11 @@ extern "C" {
     /// - `message`: The message being responded to
     /// - `result`: A result indicating the action the ES subsystem should take
     /// - `cache`: Indicates if this result should be cached. The specific caching semantics depend
-    ///            on [`es_event_type_t`].
-    ///            Cache key is generally the involved files, with modifications to those files
-    ///            invalidating the cache entry. A cache hit leads to no AUTH event being produced,
-    ///            while still producing a NOTIFY event normally. The cache argument is ignored for
-    ///            events that do not support caching.
+    ///   on [`es_event_type_t`].
+    ///   Cache key is generally the involved files, with modifications to those files
+    ///   invalidating the cache entry. A cache hit leads to no AUTH event being produced,
+    ///   while still producing a NOTIFY event normally. The cache argument is ignored for
+    ///   events that do not support caching.
     ///
     /// Some events must be responded to with [`es_respond_flags_result()`]. Responding to flags
     /// events with this function will fail.
@@ -101,14 +101,14 @@ extern "C" {
     /// - `client`: The client that produced the event
     /// - `message`: The message being responded to
     /// - `authorized_flags`: A flags value that will mask the flags in event being responded to;
-    ///                       pass 0 to deny and `u32::MAX` to allow regardless of what flags are
-    ///                       set on the event.
+    ///   pass 0 to deny and `u32::MAX` to allow regardless of what flags are
+    ///   set on the event.
     /// - `cache`: Indicates if this result should be cached. The specific caching semantics depend
-    ///            on [`es_event_type_t`].
-    ///            Cache key is generally the involved files, with modifications to those files
-    ///            invalidating the cache entry. A cache hit leads to no AUTH event being produced,
-    ///            while still producing a NOTIFY event normally. The cache argument is ignored for
-    ///            events that do not support caching.
+    ///   on [`es_event_type_t`].
+    ///   Cache key is generally the involved files, with modifications to those files
+    ///   invalidating the cache entry. A cache hit leads to no AUTH event being produced,
+    ///   while still producing a NOTIFY event normally. The cache argument is ignored for
+    ///   events that do not support caching.
     ///
     /// Some events must be responded to with [`es_respond_auth_result()`]. Responding to auth
     /// events with the function will fail.
@@ -246,95 +246,95 @@ extern "C" {
     /// as:
     ///
     /// - [`EXEC`][crate::es_event_exec_t]:
-    ///        The file being executed
+    ///   The file being executed
     /// - [`OPEN`][crate::es_event_open_t]:
-    ///        The file being opened
+    ///   The file being opened
     /// - [`MMAP`][crate::es_event_mmap_t]:
-    ///        The file being memory mapped
+    ///   The file being memory mapped
     /// - [`RENAME`][crate::es_event_rename_t]:
-    ///        Both the source and destination path.
+    ///   Both the source and destination path.
     /// - [`SIGNAL`][crate::es_event_signal_t]:
-    ///        The path of the process being signalled
+    ///   The path of the process being signalled
     /// - [`UNLINK`][crate::es_event_unlink_t]:
-    ///        The file being unlinked
+    ///   The file being unlinked
     /// - [`CLOSE`][crate::es_event_close_t]:
-    ///        The file being closed
+    ///   The file being closed
     /// - [`CREATE`][crate::es_event_create_t]:
-    ///        The path to the file that will be created or replaced
+    ///   The path to the file that will be created or replaced
     /// - [`GET_TASK`][crate::es_event_get_task_t]:
-    ///        The path of the process for which the task port
+    ///   The path of the process for which the task port
     ///   is being retrieved
     /// - [`LINK`][crate::es_event_link_t]:
-    ///        Both the source and destination path
+    ///   Both the source and destination path
     /// - [`SETATTRLIST`][crate::es_event_setattrlist_t]:
-    ///        The file for which the attributes are being set
+    ///   The file for which the attributes are being set
     /// - [`SETEXTATTR`][crate::es_event_setextattr_t]:
-    ///        The file for which the extended attributes are being set
+    ///   The file for which the extended attributes are being set
     /// - [`SETFLAGS`][crate::es_event_setflags_t]:
-    ///        The file for which flags are being set
+    ///   The file for which flags are being set
     /// - [`SETMODE`][crate::es_event_setmode_t]:
-    ///        The file for which the mode is being set
+    ///   The file for which the mode is being set
     /// - [`SETOWNER`][crate::es_event_setowner_t]:
-    ///        The file for which the owner is being set
+    ///   The file for which the owner is being set
     /// - [`WRITE`][crate::es_event_write_t]:
-    ///        The file being written to
+    ///   The file being written to
     /// - [`READLINK`][crate::es_event_readlink_t]:
-    ///        The symbolic link being resolved
+    ///   The symbolic link being resolved
     /// - [`TRUNCATE`][crate::es_event_truncate_t]:
-    ///        The file being truncated
+    ///   The file being truncated
     /// - [`CHDIR`][crate::es_event_chdir_t]:
-    ///        The new working directory
+    ///   The new working directory
     /// - [`GETATTRLIST`][crate::es_event_getattrlist_t]:
-    ///        The file for which the attribute list is being retrieved
+    ///   The file for which the attribute list is being retrieved
     /// - [`STAT`][crate::es_event_stat_t]:
-    ///        The file for which the stat is being retrieved
+    ///   The file for which the stat is being retrieved
     /// - [`ACCESS`][crate::es_event_access_t]:
-    ///        The file for which access is being tested
+    ///   The file for which access is being tested
     /// - [`CHROOT`][crate::es_event_chroot_t]:
-    ///        The file which will become the new root
+    ///   The file which will become the new root
     /// - [`UTIMES`][crate::es_event_utimes_t]:
-    ///        The file for which times are being set
+    ///   The file for which times are being set
     /// - [`CLONE`][crate::es_event_clone_t]:
-    ///        Both the source file and target path
+    ///   Both the source file and target path
     /// - [`FCNTL`][crate::es_event_fcntl_t]:
-    ///        The file under file control
+    ///   The file under file control
     /// - [`GETEXTATTR`][crate::es_event_getextattr_t]:
-    ///        The file for which extended attributes are being retrieved
+    ///   The file for which extended attributes are being retrieved
     /// - [`LISTEXTATTR`][crate::es_event_listextattr_t]:
-    ///        The file for which extended attributes are being listed
+    ///   The file for which extended attributes are being listed
     /// - [`READDIR`][crate::es_event_readdir_t]:
-    ///        The directory for whose contents will be read
+    ///   The directory for whose contents will be read
     /// - [`DELETEEXTATTR`][crate::es_event_deleteextattr_t]:
-    ///        The file for which extended attributes will be deleted
+    ///   The file for which extended attributes will be deleted
     /// - [`DUP`][crate::es_event_dup_t]:
-    ///        The file being duplicated
+    ///   The file being duplicated
     /// - [`UIPC_BIND`][crate::es_event_uipc_bind_t]:
-    ///        The path to the unix socket that will be created
+    ///   The path to the unix socket that will be created
     /// - [`UIPC_CONNECT`][crate::es_event_uipc_connect_t]:
-    ///        The file that the unix socket being connected is bound to
+    ///   The file that the unix socket being connected is bound to
     /// - [`EXCHANGEDATA`][crate::es_event_exchangedata_t]:
-    ///        The path of both file1 and file2
+    ///   The path of both file1 and file2
     /// - [`SETACL`][crate::es_event_setacl_t]:
-    ///        The file for which ACLs are being set
+    ///   The file for which ACLs are being set
     /// - [`PROC_CHECK`][crate::es_event_proc_check_t]:
-    ///        The path of the process against which access is being checked
+    ///   The path of the process against which access is being checked
     /// - [`SEARCHFS`][crate::es_event_searchfs_t]:
-    ///        The path of the volume which will be searched
+    ///   The path of the volume which will be searched
     /// - [`PROC_SUSPEND_RESUME`][crate::es_event_proc_suspend_resume_t]:
-    ///        The path of the process being suspended or resumed
+    ///   The path of the process being suspended or resumed
     /// - [`GET_TASK_NAME`][crate::es_event_get_task_name_t]:
-    ///        The path of the process for which the task name port will be retrieved
+    ///   The path of the process for which the task name port will be retrieved
     /// - [`TRACE`][crate::es_event_trace_t]:
-    ///        The path of the process that will be attached to
+    ///   The path of the process that will be attached to
     /// - [`REMOTE_THREAD_CREATE`][crate::es_event_remote_thread_create_t]:
-    ///        The path of the process in which the new thread is created
+    ///   The path of the process in which the new thread is created
     /// - [`GET_TASK_READ`][crate::es_event_get_task_read_t]:
-    ///        The path of the process for which the task read port will be retrieved
+    ///   The path of the process for which the task read port will be retrieved
     /// - [`GET_TASK_INSPECT`][crate::es_event_get_task_inspect_t]:
-    ///        The path of the process for which the task inspect port will be retrieved
+    ///   The path of the process for which the task inspect port will be retrieved
     /// - [`COPYFILE`][crate::es_event_copyfile_t]:
-    ///        The path to the source file and the path to either the new file to be created or the
-    ///        existing file to be overwritten
+    ///   The path to the source file and the path to either the new file to be created or the
+    ///   existing file to be overwritten
     #[cfg(feature = "macos_12_0_0")]
     pub fn es_mute_path(client: *mut es_client_t, path: *const c_char, type_: es_mute_path_type_t) -> es_return_t;
 
