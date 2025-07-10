@@ -28,7 +28,7 @@ fn reproduce_double_drop() {
         cnt: std::mem::ManuallyDrop::new(Box::new(0)),
     };
     Client::new(move |_client, _msg| {
-        println!("{:?}", drop_cnt);
+        println!("{drop_cnt:?}");
     })
     .unwrap();
 }
