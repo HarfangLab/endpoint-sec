@@ -61,9 +61,7 @@ pub struct audit_token_t {
 // Make the debug representation an hex string to make it shorter and clearer when debugging
 impl fmt::Debug for audit_token_t {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("audit_token_t")
-            .field(&format!("0x{:08X}", self))
-            .finish()
+        f.debug_tuple("audit_token_t").field(&format!("0x{self:08X}")).finish()
     }
 }
 

@@ -23,7 +23,7 @@ pub struct es_event_id_t {
 // Make the debug representation an hex string to make it shorter and clearer when debugging
 impl fmt::Debug for es_event_id_t {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("es_event_id_t").field(&format!("{:#X}", self)).finish()
+        f.debug_tuple("es_event_id_t").field(&format!("{self:#X}")).finish()
     }
 }
 
