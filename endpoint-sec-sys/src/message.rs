@@ -622,9 +622,34 @@ pub struct es_event_mprotect_t {
 
 /// Send a signal to a process.
 ///
+/// Signals may be sent on behalf of another process or directly. Notably
+/// launchd often sends signals on behalf of another process for service start/
+/// stop operations. If this is the case an instigator will be provided. The
+/// relationship between each process is illustrated below:
+///
+/// Delegated Signal:
+///
+/// ```
+/// Instigator Process -> IPC to Sender Process (launchd) -> Target Process
+/// ```
+///
+/// Direct Signal:
+///
+/// ```
+/// Sender Process -> Target Process
+/// ```
+///
+/// Clients may wish to block delegated signals from launchd for non-authorized
+/// instigators, while still allowing direct signals initiated by launchd for
+/// shutdown/reboot/restart.
+///
 /// This event will not fire if a process sends a signal to itself.
 ///
-/// Cache key for this event type: `(process executable file, target process executable file)`.
+/// This event does not support caching on macos 15.4+. On previous versions,
+/// cache key is (process executable file, target process executable file).
+///
+/// Be aware of the nullability of some of the fiels. The instigator may not be
+/// applicable.
 #[repr(C)]
 // 10.15.0
 pub struct es_event_signal_t {
@@ -632,10 +657,17 @@ pub struct es_event_signal_t {
     pub sig: c_int,
     /// The process that will receive the signal
     pub target: ShouldNotBeNull<es_process_t>,
-    _reserved: [u8; 64],
+    /// Process information for the instigator (if applicable).
+    ///
+    /// Field available only if message version >= 9.
+    #[cfg(feature = "macos_15_4_0")]
+    pub instigator: *mut es_process_t,
+    _reserved: [u8; 56],
 }
 
 should_not_be_null_fields!(es_event_signal_t; target -> es_process_t);
+#[cfg(feature = "macos_15_4_0")]
+null_fields!(es_event_signal_t; instigator -> es_process_t);
 
 ffi_wrap_enum!(
     es_destination_type_t(u32);
