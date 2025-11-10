@@ -426,6 +426,22 @@ ffi_wrap_enum!(
     ES_CLEAR_CACHE_RESULT_ERR_THROTTLE = 2,
 );
 
+/// Binary CDHash
+///
+/// The Code Directory Hash (CDHash) is a hash of hashes, covering a macho or
+/// an entire application bundle.
+/// The Code Directory contains the hash of each executable page in the main
+/// executable. Only when:
+///
+/// - The subject process has opted into the hardened runtime (CS_HARD/CS_KILL)
+///   - The subject process is not being debugged
+/// - The subject process is running
+///
+/// is it guaranteed that the ES provided cdhash value matches the binary
+/// observed by the kernel and that the pages actually executed have not been
+/// modified.
+pub type es_cdhash_t = [u8; 20];
+
 /// Structure buffer with size
 #[repr(C)]
 pub struct es_token_t {
