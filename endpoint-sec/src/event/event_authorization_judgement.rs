@@ -4,7 +4,7 @@ use std::ffi::OsStr;
 
 use endpoint_sec_sys::{es_authorization_result_t, es_authorization_rule_class_t, es_event_authorization_judgement_t};
 
-use crate::Process;
+use crate::{AuditToken, Process};
 
 /// Notification that a process had it's right petition judged
 #[doc(alias = "es_event_authorization_judgement_t")]
@@ -18,9 +18,22 @@ pub struct EventAuthorizationJudgement<'a> {
 impl<'a> EventAuthorizationJudgement<'a> {
     /// Process that submitted the petition (XPC caller)
     #[inline(always)]
-    pub fn instigator(&self) -> Process<'a> {
+    pub fn instigator(&self) -> Option<Process<'a>> {
         // Safety: 'a tied to self, object obtained through ES
-        Process::new(unsafe { self.raw.instigator.as_ref() }, self.version)
+        let process = unsafe { self.raw.instigator()? };
+        Some(Process::new(process, self.version))
+    }
+
+    /// Audit token of the process that instigated this event.
+    pub fn instigator_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.instigator_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.instigator().unwrap().audit_token()
     }
 
     /// Process that created the petition
@@ -31,6 +44,18 @@ impl<'a> EventAuthorizationJudgement<'a> {
             unsafe { self.raw.petitioner.as_ref()? },
             self.version,
         ))
+    }
+
+    /// Audit token of the process that created the petition.
+    pub fn petitioner_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.petitioner_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.petitioner().unwrap().audit_token()
     }
 
     /// The overall result of the petition. 0 indicates success.
@@ -59,7 +84,7 @@ unsafe impl Send for EventAuthorizationJudgement<'_> {}
 // Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Sync for EventAuthorizationJudgement<'_> {}
 
-impl_debug_eq_hash_with_functions!(EventAuthorizationJudgement<'a> with version; instigator, petitioner, return_code, result_count);
+impl_debug_eq_hash_with_functions!(EventAuthorizationJudgement<'a> with version; instigator, instigator_token, petitioner, petitioner_token, return_code, result_count);
 
 /// Describes, for a single right, the class of that right and if it was granted
 #[doc(alias = "es_authorization_result_t")]

@@ -4,7 +4,7 @@ use std::ffi::OsStr;
 
 use endpoint_sec_sys::{es_event_od_attribute_value_add_t, es_od_record_type_t};
 
-use crate::Process;
+use crate::{AuditToken, Process};
 
 /// Notification that an attribute value was added to a record.
 ///
@@ -22,9 +22,22 @@ pub struct EventOdAttributeValueAdd<'a> {
 impl<'a> EventOdAttributeValueAdd<'a> {
     /// Process that instigated operation (XPC caller).
     #[inline(always)]
-    pub fn instigator(&self) -> Process<'a> {
+    pub fn instigator(&self) -> Option<Process<'a>> {
         // Safety: 'a tied to self, object obtained through ES
-        Process::new(unsafe { self.raw.instigator.as_ref() }, self.version)
+        let process = unsafe { self.raw.instigator()? };
+        Some(Process::new(process, self.version))
+    }
+
+    /// Audit token of the process that instigated this event.
+    pub fn instigator_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.instigator_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.instigator().unwrap().audit_token()
     }
 
     /// Result code for the operation.
@@ -86,4 +99,4 @@ unsafe impl Send for EventOdAttributeValueAdd<'_> {}
 // Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Sync for EventOdAttributeValueAdd<'_> {}
 
-impl_debug_eq_hash_with_functions!(EventOdAttributeValueAdd<'a> with version; instigator, error_code, record_type, record_name, attribute_name, attribute_value, node_name, db_path);
+impl_debug_eq_hash_with_functions!(EventOdAttributeValueAdd<'a> with version; instigator, instigator_token, error_code, record_type, record_name, attribute_name, attribute_value, node_name, db_path);

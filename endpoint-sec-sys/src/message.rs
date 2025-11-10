@@ -1146,20 +1146,25 @@ should_not_be_null_fields!(es_event_file_provider_update_t; source -> es_file_t)
 #[repr(C)]
 // 10.15.0
 pub struct es_event_file_provider_materialize_t {
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// The staged file that has been materialized
     pub source: ShouldNotBeNull<es_file_t>,
     /// The destination of the staged `source` file
     pub target: ShouldNotBeNull<es_file_t>,
-    _reserved: [u8; 64],
+    /// The audit_token of the process instigating this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
+    _reserved: [u8; 32],
 }
 
 should_not_be_null_fields!(
     es_event_file_provider_materialize_t;
-    instigator -> es_process_t,
     source -> es_file_t,
     target -> es_file_t
 );
+null_fields!(es_event_file_provider_materialize_t; instigator -> es_process_t);
 
 /// Resolve a symbolic link.
 ///
@@ -1659,7 +1664,7 @@ pub struct es_event_setregid_t {
 #[repr(C)]
 pub struct es_event_authentication_od_t {
     /// Process that instigated the authentication (XPC caller that asked for authentication).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// OD record type against which OD is authenticating. Typically `Users`, but other record types
     /// can auth too.
     pub record_type: es_string_token_t,
@@ -1672,10 +1677,15 @@ pub struct es_event_authentication_od_t {
     /// Optional. If node_name is "/Local/Default", this is the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_13_0_0")]
-should_not_be_null_fields!(es_event_authentication_od_t; instigator -> es_process_t);
+null_fields!(es_event_authentication_od_t; instigator -> es_process_t);
 
 #[cfg(feature = "macos_13_0_0")]
 ffi_wrap_enum!(
@@ -1694,17 +1704,22 @@ ffi_wrap_enum!(
 #[repr(C)]
 pub struct es_event_authentication_touchid_t {
     /// Process that instigated the authentication (XPC caller that asked for authentication).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// TouchID authentication type
     pub touchid_mode: es_touchid_mode_t,
     /// Describes whether or not the uid of the user authenticated is available
     pub has_uid: bool,
     /// Union that is valid when `has_uid` is set to `true`
     pub anon0: es_event_authentication_touchid_t_anon0,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_13_0_0")]
-should_not_be_null_fields!(es_event_authentication_touchid_t; instigator -> es_process_t);
+null_fields!(es_event_authentication_touchid_t; instigator -> es_process_t);
 
 /// See [`es_event_authentication_touchid_t`]
 #[cfg(feature = "macos_13_0_0")]
@@ -1722,7 +1737,7 @@ pub union es_event_authentication_touchid_t_anon0 {
 #[repr(C)]
 pub struct es_event_authentication_token_t {
     /// Process that instigated the authentication (XPC caller that asked for authentication).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Hash of the public key which CryptoTokenKit is authenticating.
     pub pubkey_hash: es_string_token_t,
     /// Token identifier of the event which CryptoTokenKit is authenticating.
@@ -1730,10 +1745,15 @@ pub struct es_event_authentication_token_t {
     /// Optional. This will be available if token is used for GSS PKINIT authentication for
     /// obtaining a kerberos TGT. `NULL` in all other cases.
     pub kerberos_principal: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_13_0_0")]
-should_not_be_null_fields!(es_event_authentication_token_t; instigator -> es_process_t);
+null_fields!(es_event_authentication_token_t; instigator -> es_process_t);
 
 #[cfg(feature = "macos_13_0_0")]
 ffi_wrap_enum!(
@@ -2096,12 +2116,32 @@ pub struct es_event_btm_launch_item_add_t {
     /// Optional. If available and applicable, the POSIX executable path from the launchd plist. If
     /// the path is relative, it is relative to `item.app_url`.
     pub executable_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: *mut audit_token_t,
+    /// Audit token of the app process that registered the item.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub app_token: *mut audit_token_t,
 }
 
 #[cfg(feature = "macos_13_0_0")]
 should_not_be_null_fields!(es_event_btm_launch_item_add_t; item -> es_btm_launch_item_t);
 #[cfg(feature = "macos_13_0_0")]
-null_fields!(es_event_btm_launch_item_add_t; instigator -> es_process_t, app -> es_process_t);
+null_fields!(
+    es_event_btm_launch_item_add_t;
+    instigator -> es_process_t,
+    app -> es_process_t
+);
+#[cfg(feature = "macos_15_0_0")]
+null_fields!(
+    es_event_btm_launch_item_add_t;
+    instigator_token -> audit_token_t,
+    app_token -> audit_token_t,
+);
 
 /// Notification for launch item being removed from background
 ///        task management.  This includes launch agents and daemons as
@@ -2118,12 +2158,32 @@ pub struct es_event_btm_launch_item_remove_t {
     pub app: *mut es_process_t,
     /// BTM launch item.
     pub item: ShouldNotBeNull<es_btm_launch_item_t>,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: *mut audit_token_t,
+    /// Audit token of the app process that removed the item.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub app_token: *mut audit_token_t,
 }
 
 #[cfg(feature = "macos_13_0_0")]
 should_not_be_null_fields!(es_event_btm_launch_item_remove_t; item -> es_btm_launch_item_t);
 #[cfg(feature = "macos_13_0_0")]
-null_fields!(es_event_btm_launch_item_remove_t; instigator -> es_process_t, app -> es_process_t);
+null_fields!(
+    es_event_btm_launch_item_remove_t;
+    instigator -> es_process_t,
+    app -> es_process_t,
+);
+#[cfg(feature = "macos_15_0_0")]
+null_fields!(
+    es_event_btm_launch_item_remove_t;
+    instigator_token -> audit_token_t,
+    app_token -> audit_token_t,
+);
 
 /// Notification for a su policy decisions events.
 ///
@@ -2237,15 +2297,22 @@ pub union es_event_sudo_t_anon0 {
 #[repr(C)]
 pub struct es_event_profile_add_t {
     /// Process that instigated the Profile install or update.
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Indicates if the profile is an update to an already installed profile.
     pub is_update: bool,
     /// Profile install item.
     pub profile: ShouldNotBeNull<es_profile_t>,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_profile_add_t; instigator -> es_process_t, profile -> es_profile_t);
+should_not_be_null_fields!(es_event_profile_add_t; profile -> es_profile_t);
+#[cfg(feature = "macos_14_0_0")]
+null_fields!(es_event_profile_add_t; instigator -> es_process_t);
 
 /// Notification for Profiles removed on the system.
 ///
@@ -2254,13 +2321,20 @@ should_not_be_null_fields!(es_event_profile_add_t; instigator -> es_process_t, p
 #[repr(C)]
 pub struct es_event_profile_remove_t {
     /// Process that instigated the Profile removal.
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Profile being removed.
     pub profile: ShouldNotBeNull<es_profile_t>,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_profile_remove_t; instigator -> es_process_t, profile -> es_profile_t);
+should_not_be_null_fields!(es_event_profile_remove_t; profile -> es_profile_t);
+#[cfg(feature = "macos_14_0_0")]
+null_fields!(es_event_profile_remove_t; instigator -> es_process_t);
 
 /// Notification that a process petitioned for certain authorization rights
 ///
@@ -2269,7 +2343,7 @@ should_not_be_null_fields!(es_event_profile_remove_t; instigator -> es_process_t
 #[repr(C)]
 pub struct es_event_authorization_petition_t {
     /// Process that submitted the petition (XPC caller)
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Process that created the petition
     pub petitioner: *mut es_process_t,
     /// Flags associated with the petition. Defined in Security framework "Authorization/Authorization.h"
@@ -2278,12 +2352,20 @@ pub struct es_event_authorization_petition_t {
     pub right_count: usize,
     /// Array of string tokens, each token is the name of a right being requested
     pub rights: *mut es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
+    /// Audit token of the process that created the petition.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub petitioner_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_authorization_petition_t; instigator -> es_process_t);
-#[cfg(feature = "macos_14_0_0")]
-null_fields!(es_event_authorization_petition_t; petitioner -> es_process_t);
+null_fields!(es_event_authorization_petition_t; instigator -> es_process_t, petitioner -> es_process_t);
 
 /// Describes, for a single right, the class of that right and if it was granted
 #[cfg(feature = "macos_14_0_0")]
@@ -2306,7 +2388,7 @@ pub struct es_authorization_result_t {
 #[repr(C)]
 pub struct es_event_authorization_judgement_t {
     /// Process that submitted the petition (XPC caller)
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Process that created the petition
     pub petitioner: *mut es_process_t,
     /// The overall result of the petition. 0 indicates success.
@@ -2317,12 +2399,20 @@ pub struct es_event_authorization_judgement_t {
     pub result_count: usize,
     /// Array of results. One for each right that was petitioned
     pub results: *mut es_authorization_result_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
+    /// Audit token of the process that created the petition.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub petitioner_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_authorization_judgement_t; instigator -> es_process_t);
-#[cfg(feature = "macos_14_0_0")]
-null_fields!(es_event_authorization_judgement_t; petitioner -> es_process_t);
+null_fields!(es_event_authorization_judgement_t; instigator -> es_process_t, petitioner -> es_process_t);
 
 /// The identity of a group member
 #[cfg(feature = "macos_14_0_0")]
@@ -2354,7 +2444,7 @@ pub union es_od_member_id_t_anon0 {
 #[repr(C)]
 pub struct es_event_od_group_add_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     pub error_code: i32,
     /// The group to which the member was added.
@@ -2368,10 +2458,15 @@ pub struct es_event_od_group_add_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_group_add_t; instigator -> es_process_t);
+null_fields!(es_event_od_group_add_t; instigator -> es_process_t);
 
 /// Notification that a member was removed to a group.
 ///
@@ -2383,7 +2478,7 @@ should_not_be_null_fields!(es_event_od_group_add_t; instigator -> es_process_t);
 #[repr(C)]
 pub struct es_event_od_group_remove_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     pub error_code: i32,
     /// The group to which the member was removed.
@@ -2397,10 +2492,15 @@ pub struct es_event_od_group_remove_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_group_remove_t; instigator -> es_process_t);
+null_fields!(es_event_od_group_remove_t; instigator -> es_process_t);
 
 /// An array of group member identities.
 #[cfg(feature = "macos_14_0_0")]
@@ -2433,7 +2533,7 @@ pub union es_od_member_id_array_t_anon0 {
 #[repr(C)]
 pub struct es_event_od_group_set_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2449,10 +2549,15 @@ pub struct es_event_od_group_set_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_group_set_t; instigator -> es_process_t);
+null_fields!(es_event_od_group_set_t; instigator -> es_process_t);
 
 /// Notification that an account had its password modified.
 ///
@@ -2461,7 +2566,7 @@ should_not_be_null_fields!(es_event_od_group_set_t; instigator -> es_process_t);
 #[repr(C)]
 pub struct es_event_od_modify_password_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2477,10 +2582,15 @@ pub struct es_event_od_modify_password_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_modify_password_t; instigator -> es_process_t);
+null_fields!(es_event_od_modify_password_t; instigator -> es_process_t);
 
 /// Notification that a user account was disabled.
 ///
@@ -2489,7 +2599,7 @@ should_not_be_null_fields!(es_event_od_modify_password_t; instigator -> es_proce
 #[repr(C)]
 pub struct es_event_od_disable_user_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2503,10 +2613,15 @@ pub struct es_event_od_disable_user_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_disable_user_t; instigator -> es_process_t);
+null_fields!(es_event_od_disable_user_t; instigator -> es_process_t);
 
 /// Notification that a user account was enabled.
 ///
@@ -2515,7 +2630,7 @@ should_not_be_null_fields!(es_event_od_disable_user_t; instigator -> es_process_
 #[repr(C)]
 pub struct es_event_od_enable_user_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2529,10 +2644,15 @@ pub struct es_event_od_enable_user_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_enable_user_t; instigator -> es_process_t);
+null_fields!(es_event_od_enable_user_t; instigator -> es_process_t);
 
 /// Notification that an attribute value was added to a record.
 ///
@@ -2545,7 +2665,7 @@ should_not_be_null_fields!(es_event_od_enable_user_t; instigator -> es_process_t
 #[repr(C)]
 pub struct es_event_od_attribute_value_add_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2565,10 +2685,15 @@ pub struct es_event_od_attribute_value_add_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_attribute_value_add_t; instigator -> es_process_t);
+null_fields!(es_event_od_attribute_value_add_t; instigator -> es_process_t);
 
 /// Notification that an attribute value was removed to a record.
 ///
@@ -2583,7 +2708,7 @@ should_not_be_null_fields!(es_event_od_attribute_value_add_t; instigator -> es_p
 #[repr(C)]
 pub struct es_event_od_attribute_value_remove_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2603,7 +2728,15 @@ pub struct es_event_od_attribute_value_remove_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
+
+#[cfg(feature = "macos_14_0_0")]
+null_fields!(es_event_od_attribute_value_remove_t; instigator -> es_process_t);
 
 /// Notification that an attribute is being set.
 ///
@@ -2618,7 +2751,7 @@ pub struct es_event_od_attribute_value_remove_t {
 #[repr(C)]
 pub struct es_event_od_attribute_set_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2640,10 +2773,15 @@ pub struct es_event_od_attribute_set_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_attribute_set_t; instigator -> es_process_t);
+null_fields!(es_event_od_attribute_set_t; instigator -> es_process_t);
 
 /// Notification that a user account was created.
 ///
@@ -2652,7 +2790,7 @@ should_not_be_null_fields!(es_event_od_attribute_set_t; instigator -> es_process
 #[repr(C)]
 pub struct es_event_od_create_user_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2666,10 +2804,15 @@ pub struct es_event_od_create_user_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_create_user_t; instigator -> es_process_t);
+null_fields!(es_event_od_create_user_t; instigator -> es_process_t);
 
 /// Notification that a group was created.
 ///
@@ -2678,7 +2821,7 @@ should_not_be_null_fields!(es_event_od_create_user_t; instigator -> es_process_t
 #[repr(C)]
 pub struct es_event_od_create_group_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2692,10 +2835,15 @@ pub struct es_event_od_create_group_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_create_group_t; instigator -> es_process_t);
+null_fields!(es_event_od_create_group_t; instigator -> es_process_t);
 
 /// Notification that a user account was deleted.
 ///
@@ -2704,7 +2852,7 @@ should_not_be_null_fields!(es_event_od_create_group_t; instigator -> es_process_
 #[repr(C)]
 pub struct es_event_od_delete_user_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2718,10 +2866,15 @@ pub struct es_event_od_delete_user_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_delete_user_t; instigator -> es_process_t);
+null_fields!(es_event_od_delete_user_t; instigator -> es_process_t);
 
 /// Notification that a group was deleted.
 ///
@@ -2730,7 +2883,7 @@ should_not_be_null_fields!(es_event_od_delete_user_t; instigator -> es_process_t
 #[repr(C)]
 pub struct es_event_od_delete_group_t {
     /// Process that instigated operation (XPC caller).
-    pub instigator: ShouldNotBeNull<es_process_t>,
+    pub instigator: *mut es_process_t,
     /// Result code for the operation.
     ///
     /// Values indicating specific failure reasons are defined in odconstants.h.
@@ -2744,10 +2897,15 @@ pub struct es_event_od_delete_group_t {
     /// Optional. If node_name is "/Local/Default", this is, the path of the database against which
     /// OD is authenticating.
     pub db_path: es_string_token_t,
+    /// Audit token of the process that instigated this event.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub instigator_token: audit_token_t,
 }
 
 #[cfg(feature = "macos_14_0_0")]
-should_not_be_null_fields!(es_event_od_delete_group_t; instigator -> es_process_t);
+null_fields!(es_event_od_delete_group_t; instigator -> es_process_t);
 
 /// Notification for an XPC connection being established to a named service.
 #[cfg(feature = "macos_14_0_0")]

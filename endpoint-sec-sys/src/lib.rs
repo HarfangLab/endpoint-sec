@@ -597,7 +597,6 @@ macro_rules! should_not_be_null_fields {
 }
 
 /// Provides an access function for fields that are `*mut T` or `*const T`
-#[cfg(feature = "macos_10_15_1")]
 macro_rules! null_fields {
     ($ty: ty; $($field: ident -> $field_ty: ty),+ $(,)?) => {
         /// Accessors for `*mut` and `*const` fields

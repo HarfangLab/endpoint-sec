@@ -8,7 +8,7 @@ use endpoint_sec_sys::{
     es_event_authentication_token_t, es_event_authentication_touchid_t, es_touchid_mode_t, uid_t,
 };
 
-use crate::Process;
+use crate::{AuditToken, Process};
 
 /// An authentication was performed.
 #[doc(alias = "es_event_authentication_t")]
@@ -108,12 +108,22 @@ pub struct EventAuthenticationOd<'a> {
 impl<'a> EventAuthenticationOd<'a> {
     /// Process that instigated the authentication (XPC caller that asked for authentication).
     #[inline(always)]
-    pub fn instigator(&self) -> Process<'a> {
-        Process::new(
-            // Safety: 'a tied to self, object obtained through ES
-            unsafe { self.raw.instigator.as_ref() },
-            self.version,
-        )
+    pub fn instigator(&self) -> Option<Process<'a>> {
+        // Safety: 'a tied to self, object obtained through ES
+        let process = unsafe { self.raw.instigator()? };
+        Some(Process::new(process, self.version))
+    }
+
+    /// Audit token of the process that instigated this event.
+    pub fn instigator_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.instigator_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.instigator().unwrap().audit_token()
     }
 
     /// OD record type against which OD is authenticating. Typically `Users`, but other record types
@@ -152,7 +162,7 @@ impl<'a> EventAuthenticationOd<'a> {
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventAuthenticationOd<'_> {}
 
-impl_debug_eq_hash_with_functions!(EventAuthenticationOd<'a>; instigator, record_name, node_name, db_path);
+impl_debug_eq_hash_with_functions!(EventAuthenticationOd<'a>; instigator, instigator_token, record_name, node_name, db_path);
 
 /// TouchID authentication data
 #[doc(alias = "es_event_authentication_touchid_t")]
@@ -168,12 +178,22 @@ pub struct EventAuthenticationTouchId<'a> {
 impl<'a> EventAuthenticationTouchId<'a> {
     /// Process that instigated the authentication (XPC caller that asked for authentication).
     #[inline(always)]
-    pub fn instigator(&self) -> Process<'a> {
-        Process::new(
-            // Safety: 'a tied to self, object obtained through ES
-            unsafe { self.raw.instigator.as_ref() },
-            self.version,
-        )
+    pub fn instigator(&self) -> Option<Process<'a>> {
+        // Safety: 'a tied to self, object obtained through ES
+        let process = unsafe { self.raw.instigator()? };
+        Some(Process::new(process, self.version))
+    }
+
+    /// Audit token of the process that instigated this event.
+    pub fn instigator_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.instigator_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.instigator().unwrap().audit_token()
     }
 
     /// TouchID authentication type
@@ -202,7 +222,7 @@ impl<'a> EventAuthenticationTouchId<'a> {
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventAuthenticationTouchId<'_> {}
 
-impl_debug_eq_hash_with_functions!(EventAuthenticationTouchId<'a>; instigator, touchid_mode, has_uid, uid);
+impl_debug_eq_hash_with_functions!(EventAuthenticationTouchId<'a>; instigator, instigator_token, touchid_mode, has_uid, uid);
 
 /// Token authentication data
 #[doc(alias = "es_event_authentication_token_t")]
@@ -216,12 +236,22 @@ pub struct EventAuthenticationToken<'a> {
 impl<'a> EventAuthenticationToken<'a> {
     /// Process that instigated the authentication (XPC caller that asked for authentication).
     #[inline(always)]
-    pub fn instigator(&self) -> Process<'a> {
-        Process::new(
-            // Safety: 'a tied to self, object obtained through ES
-            unsafe { self.raw.instigator.as_ref() },
-            self.version,
-        )
+    pub fn instigator(&self) -> Option<Process<'a>> {
+        // Safety: 'a tied to self, object obtained through ES
+        let process = unsafe { self.raw.instigator()? };
+        Some(Process::new(process, self.version))
+    }
+
+    /// Audit token of the process that instigated this event.
+    pub fn instigator_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.instigator_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.instigator().unwrap().audit_token()
     }
 
     /// Hash of the public key which CryptoTokenKit is authenticating.
@@ -250,7 +280,7 @@ impl<'a> EventAuthenticationToken<'a> {
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Send for EventAuthenticationToken<'_> {}
 
-impl_debug_eq_hash_with_functions!(EventAuthenticationToken<'a>; instigator, pubkey_hash, token_id, kerberos_principal);
+impl_debug_eq_hash_with_functions!(EventAuthenticationToken<'a>; instigator, instigator_token, pubkey_hash, token_id, kerberos_principal);
 
 /// Auto unlock authentication data
 #[doc(alias = "es_event_authentication_auto_unlock_t")]
