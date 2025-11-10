@@ -343,6 +343,10 @@ ffi_wrap_enum!(
     == MACOS_15_0_0;
     --
     ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE = 146,
+
+    == #[cfg(feature = "macos_15_4_0")] 15_4_0 "15.4.0";
+    --
+    ES_EVENT_TYPE_NOTIFY_TCC_MODIFY = 147,
 );
 
 ffi_wrap_enum!(
@@ -714,3 +718,77 @@ pub struct es_signed_file_info_t {
     /// Team Identifier, if available in the signing information.
     pub team_id: es_string_token_t,
 }
+
+#[cfg(feature = "macos_15_4_0")]
+ffi_wrap_enum!(
+    /// Represent the type of TCC modification event.
+    es_tcc_event_type_t(u32);
+
+    == MACOS_15_4_0;
+    /// Unknown prior state.
+    ES_TCC_EVENT_TYPE_UNKNOWN = 0,
+    /// A new TCC authorization record was created.
+    ES_TCC_EVENT_TYPE_CREATE = 1,
+    /// An existing TCC authorization record was modified.
+    ES_TCC_EVENT_TYPE_MODIFY = 2,
+    --
+    /// An existing TCC authorization record was deleted.
+    ES_TCC_EVENT_TYPE_DELETE = 3,
+);
+
+#[cfg(feature = "macos_15_4_0")]
+ffi_wrap_enum!(
+    /// Represents the type of authorization permission an application has to a
+    /// TCC Service.
+     es_tcc_authorization_right_t(u32);
+
+    == MACOS_15_4_0;
+    ES_TCC_AUTHORIZATION_RIGHT_DENIED = 0,
+    ES_TCC_AUTHORIZATION_RIGHT_UNKNOWN = 1,
+    ES_TCC_AUTHORIZATION_RIGHT_ALLOWED = 2,
+    ES_TCC_AUTHORIZATION_RIGHT_LIMITED = 3,
+    ES_TCC_AUTHORIZATION_RIGHT_ADD_MODIFY_ADDED = 4,
+    ES_TCC_AUTHORIZATION_RIGHT_SESSION_PID = 5,
+    --
+    ES_TCC_AUTHORIZATION_RIGHT_LEARN_MORE = 6,
+);
+
+#[cfg(feature = "macos_15_4_0")]
+ffi_wrap_enum!(
+    /// Represents the reason a TCC permission was updated.
+    es_tcc_authorization_reason_t(u32);
+
+    == MACOS_15_4_0;
+    ES_TCC_AUTHORIZATION_REASON_NONE = 0,
+    ES_TCC_AUTHORIZATION_REASON_ERROR = 1,
+    /// User answered a prompt
+    ES_TCC_AUTHORIZATION_REASON_USER_CONSENT = 2,
+    /// User changed the authorization right via Preferences
+    ES_TCC_AUTHORIZATION_REASON_USER_SET = 3,
+    /// A system process changed the authorization right
+    ES_TCC_AUTHORIZATION_REASON_SYSTEM_SET = 4,
+    ES_TCC_AUTHORIZATION_REASON_SERVICE_POLICY = 5,
+    ES_TCC_AUTHORIZATION_REASON_MDM_POLICY = 6,
+    ES_TCC_AUTHORIZATION_REASON_SERVICE_OVERRIDE_POLICY = 7,
+    ES_TCC_AUTHORIZATION_REASON_MISSING_USAGE_STRING = 8,
+    ES_TCC_AUTHORIZATION_REASON_PROMPT_TIMEOUT = 9,
+    ES_TCC_AUTHORIZATION_REASON_PREFLIGHT_UNKNOWN = 10,
+    ES_TCC_AUTHORIZATION_REASON_ENTITLED = 11,
+    ES_TCC_AUTHORIZATION_REASON_APP_TYPE_POLICY = 12,
+    --
+    ES_TCC_AUTHORIZATION_REASON_PROMPT_CANCEL = 13,
+);
+
+#[cfg(feature = "macos_15_4_0")]
+ffi_wrap_enum!(
+    /// Represent the identity type of an application which has access to a TCC
+    /// service.
+    es_tcc_identity_type_t(u32);
+
+    == MACOS_15_4_0;
+    ES_TCC_IDENTITY_TYPE_BUNDLE_ID = 0,
+    ES_TCC_IDENTITY_TYPE_EXECUTABLE_PATH = 1,
+    ES_TCC_IDENTITY_TYPE_POLICY_ID = 2,
+    --
+    ES_TCC_IDENTITY_TYPE_FILE_PROVIDER_DOMAIN_ID = 3,
+);

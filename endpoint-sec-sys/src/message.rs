@@ -34,6 +34,8 @@ use super::{
 };
 #[cfg(feature = "macos_15_0_0")]
 use super::{es_gatekeeper_user_override_file_type_t, es_sha256_t, es_signed_file_info_t};
+#[cfg(feature = "macos_15_4_0")]
+use super::{es_tcc_authorization_reason_t, es_tcc_authorization_right_t, es_tcc_event_type_t, es_tcc_identity_type_t};
 
 /// Provides the [`stat`][struct@stat] information and path to a file that relates to a security
 /// event. The path may be truncated, which is indicated by the `path_truncated` flag.
@@ -3016,6 +3018,44 @@ null_fields!(
     signing_info -> es_signed_file_info_t
 );
 
+/// TCC Modification Event.
+///
+/// Occurs when a TCC permission is granted or revoked.
+///
+/// Note: This event type does not support caching.
+#[cfg(feature = "macos_15_4_0")]
+#[repr(C)]
+pub struct es_event_tcc_modify_t {
+    /// The TCC service for which permissions are being modified.
+    pub service: es_string_token_t,
+    /// The identity of the application that is the subject of the permission.
+    pub identity: es_string_token_t,
+    /// The identity type of the application string (Bundle ID, path, etc).
+    pub identity_type: es_tcc_identity_type_t,
+    /// The type of TCC modification event (Grant/Revoke etc)
+    pub update_type: es_tcc_event_type_t,
+    /// Audit token of the instigator of the modification.
+    pub instigator_token: audit_token_t,
+    /// (Optional) The process information for the instigator.
+    pub instigator: *mut es_process_t,
+    /// (Optional) Audit token of the responsible process for the modification.
+    pub responsible_token: *mut audit_token_t,
+    /// (Optional) The process information for the responsible process.
+    pub responsible: *mut es_process_t,
+    /// The resulting TCC permission of the operation/modification.
+    pub right: es_tcc_authorization_right_t,
+    /// The reason the TCC permissions were updated.
+    pub reason: es_tcc_authorization_reason_t,
+}
+
+#[cfg(feature = "macos_15_4_0")]
+null_fields!(
+    es_event_tcc_modify_t;
+    instigator -> es_process_t,
+    responsible_token -> audit_token_t,
+    responsible -> es_process_t,
+);
+
 /// Union of all possible events that can appear in an [`es_message_t`]
 #[repr(C)]
 pub union es_events_t {
@@ -3220,6 +3260,10 @@ pub union es_events_t {
     // 15.0.0
     #[cfg(feature = "macos_15_0_0")]
     pub gatekeeper_user_override: ShouldNotBeNull<es_event_gatekeeper_user_override_t>,
+
+    // 15.4.0
+    #[cfg(feature = "macos_15_4_0")]
+    pub tcc_modify: ShouldNotBeNull<es_event_tcc_modify_t>,
 }
 
 /// Indicates the result of the ES subsystem authorization process
@@ -3335,6 +3379,7 @@ pub union es_result_t_anon_0 {
 /// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER`]
 /// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP`]
 /// - [`ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_TCC_MODIFY`]
 #[repr(C)]
 pub struct es_message_t {
     /// Indicates the message version; some fields are not available and must not be accessed unless

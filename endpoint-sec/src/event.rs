@@ -381,6 +381,10 @@ define_event_enum!(
         == #[cfg(feature = "macos_15_0_0")]
         /// Notification for a gatekeeper_user_override event.
         ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE => NotifyGatekeeperUserOverride (EventGatekeeperUserOverride [_ => None] { raw: raw_event.gatekeeper_user_override.as_opt()?, }),
+
+        == #[cfg(feature = "macos_15_4_0")]
+        /// Notification for a gatekeeper_user_override event.
+        ES_EVENT_TYPE_NOTIFY_TCC_MODIFY => NotifyTccModify (EventTccModify [_ => None] { raw: raw_event.tcc_modify.as_opt()?, version, }),
     }
 );
 
@@ -652,4 +656,7 @@ cfg_mod! {
 
     == #[cfg(feature = "macos_15_0_0")];
     mod event_gatekeeper_user_override;
+
+    == #[cfg(feature = "macos_15_4_0")];
+    mod event_tcc_modify;
 }
