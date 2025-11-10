@@ -137,6 +137,21 @@ ffi_wrap_enum!(
     ES_AUTHENTICATION_TYPE_AUTO_UNLOCK = 3,
 );
 
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// Describes the type of plugin types in sudo.
+    es_sudo_plugin_type_t(u32);
+
+    == MACOS_14_0_0;
+    ES_SUDO_PLUGIN_TYPE_UNKNOWN = 0,
+    ES_SUDO_PLUGIN_TYPE_FRONT_END = 1,
+    ES_SUDO_PLUGIN_TYPE_POLICY = 2,
+    ES_SUDO_PLUGIN_TYPE_IO = 3,
+    ES_SUDO_PLUGIN_TYPE_AUDIT = 4,
+    --
+    ES_SUDO_PLUGIN_TYPE_APPROVAL = 5,
+);
+
 ffi_wrap_enum!(
     /// The valid event types recognized by Endpoint Security.
     ///

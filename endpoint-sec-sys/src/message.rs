@@ -29,7 +29,8 @@ use super::{
 use super::{es_address_type_t, es_authentication_type_t};
 #[cfg(feature = "macos_14_0_0")]
 use super::{
-    es_authorization_rule_class_t, es_od_account_type_t, es_od_member_type_t, es_od_record_type_t, es_xpc_domain_type_t,
+    es_authorization_rule_class_t, es_od_account_type_t, es_od_member_type_t, es_od_record_type_t,
+    es_sudo_plugin_type_t, es_xpc_domain_type_t,
 };
 #[cfg(feature = "macos_15_0_0")]
 use super::{es_gatekeeper_user_override_file_type_t, es_sha256_t, es_signed_file_info_t};
@@ -2268,21 +2269,6 @@ pub struct es_event_su_t {
 pub union es_event_su_t_anon0 {
     pub uid: uid_t,
 }
-
-#[cfg(feature = "macos_14_0_0")]
-ffi_wrap_enum!(
-    /// Describes the type of plugin types in sudo.
-    es_sudo_plugin_type_t(u32);
-
-    == MACOS_14_0_0;
-    ES_SUDO_PLUGIN_TYPE_UNKNOWN = 0,
-    ES_SUDO_PLUGIN_TYPE_FRONT_END = 1,
-    ES_SUDO_PLUGIN_TYPE_POLICY = 2,
-    ES_SUDO_PLUGIN_TYPE_IO = 3,
-    ES_SUDO_PLUGIN_TYPE_AUDIT = 4,
-    --
-    ES_SUDO_PLUGIN_TYPE_APPROVAL = 5,
-);
 
 /// Provides context about failures in [`es_event_sudo_t`].
 #[cfg(feature = "macos_14_0_0")]
