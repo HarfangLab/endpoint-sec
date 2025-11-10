@@ -244,7 +244,7 @@ ffi_wrap_enum!(
     /// See [`es_btm_launch_item_t`]
     es_btm_item_type_t(u32);
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     ES_BTM_ITEM_TYPE_USER_ITEM = 0,
     ES_BTM_ITEM_TYPE_APP = 1,
     ES_BTM_ITEM_TYPE_LOGIN_ITEM = 2,
@@ -281,7 +281,7 @@ ffi_wrap_enum!(
     /// See [`es_profile_t`]
     es_profile_source_t(u32);
 
-    == MACOS_14_0_0;
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
     /// MDM (managed) installation
     ES_PROFILE_SOURCE_MANAGED = 0,
     --
@@ -522,7 +522,7 @@ ffi_wrap_enum!(
     /// See [`es_event_mount_t`]
     es_mount_disposition_t(u32);
 
-    == MACOS_15_0_0;
+    == #[cfg(feature = "macos_15_0_0")] 15_0_0 "15.0.0";
     /// Device is external storage.
     ES_MOUNT_DISPOSITION_EXTERNAL = 0,
     /// Device is internal storage.
@@ -1769,7 +1769,7 @@ ffi_wrap_enum!(
     /// See [`es_event_authentication_touchid_t`]
     es_touchid_mode_t(u32);
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     ES_TOUCHID_MODE_VERIFICATION = 0,
     --
     ES_TOUCHID_MODE_IDENTIFICATION = 1,
@@ -1837,7 +1837,7 @@ ffi_wrap_enum!(
     /// See [`es_event_authentication_auto_unlock_t`].
     es_auto_unlock_type_t(u32);
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     /// Unlock the machine using Apple Watch.
     ES_AUTO_UNLOCK_MACHINE_UNLOCK = 1,
     --
@@ -2069,7 +2069,7 @@ ffi_wrap_enum!(
     /// See [`es_event_openssh_login_t`]
     es_openssh_login_result_type_t(u32);
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     ES_OPENSSH_LOGIN_EXCEED_MAXTRIES = 0,
     ES_OPENSSH_LOGIN_ROOT_DENIED = 1,
     ES_OPENSSH_AUTH_SUCCESS = 2,

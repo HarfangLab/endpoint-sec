@@ -180,123 +180,27 @@ macro_rules! ffi_wrap_enum {
         $(
             == MACOS_10_15_0;
             $(
-                $(#[$doc_10_15_0:meta])*
-                $variant_10_15_0: ident = $value_10_15_0: literal,
+                $(#[$doc_first:meta])*
+                $variant_first: ident = $value_first: literal,
             )*
 
             --
 
-            $(#[$doc_last_10_15_0:meta])*
-            $variant_last_10_15_0: ident = $value_last_10_15_0: literal,
+            $(#[$doc_last_first:meta])*
+            $variant_last_first: ident = $value_last_first: literal,
         )?
         $(
-            == MACOS_10_15_1;
+            == #[cfg(feature = $ver_feature_lit:literal)] $ver_ident:tt $ver_str:literal;
             $(
-                $(#[$doc_10_15_1:meta])*
-                $variant_10_15_1: ident = $value_10_15_1: literal,
+                $(#[$doc_ver:meta])*
+                $variant_ver: ident = $value_ver: literal,
             )*
 
             --
 
-            $(#[$doc_last_10_15_1:meta])*
-            $variant_last_10_15_1: ident = $value_last_10_15_1: literal,
-        )?
-        $(
-            == MACOS_10_15_4;
-            $(
-                $(#[$doc_10_15_4:meta])*
-                $variant_10_15_4: ident = $value_10_15_4: literal,
-            )*
-
-            --
-
-            $(#[$doc_last_10_15_4:meta])*
-            $variant_last_10_15_4: ident = $value_last_10_15_4: literal,
-        )?
-        $(
-            == MACOS_11_0_0;
-            $(
-                $(#[$doc_11_0_0:meta])*
-                $variant_11_0_0: ident = $value_11_0_0: literal,
-            )*
-
-            --
-
-            $(#[$doc_last_11_0_0:meta])*
-            $variant_last_11_0_0: ident = $value_last_11_0_0: literal,
-        )?
-        $(
-            == MACOS_11_3_0;
-            $(
-                $(#[$doc_11_3_0:meta])*
-                $variant_11_3_0: ident = $value_11_3_0: literal,
-            )*
-
-            --
-
-            $(#[$doc_last_11_3_0:meta])*
-            $variant_last_11_3_0: ident = $value_last_11_3_0: literal,
-        )?
-        $(
-            == MACOS_12_0_0;
-            $(
-                $(#[$doc_12_0_0:meta])*
-                $variant_12_0_0: ident = $value_12_0_0: literal,
-            )*
-
-            --
-
-            $(#[$doc_last_12_0_0:meta])*
-            $variant_last_12_0_0: ident = $value_last_12_0_0: literal,
-        )?
-        $(
-            == MACOS_13_0_0;
-            $(
-                $(#[$doc_13_0_0:meta])*
-                $variant_13_0_0: ident = $value_13_0_0: literal,
-            )*
-
-            --
-
-            $(#[$doc_last_13_0_0:meta])*
-            $variant_last_13_0_0: ident = $value_last_13_0_0: literal,
-        )?
-        $(
-            == MACOS_14_0_0;
-            $(
-                $(#[$doc_14_0_0:meta])*
-                $variant_14_0_0: ident = $value_14_0_0: literal,
-            )*
-
-            --
-
-            $(#[$doc_last_14_0_0:meta])*
-            $variant_last_14_0_0: ident = $value_last_14_0_0: literal,
-        )?
-        $(
-            == MACOS_15_0_0;
-            $(
-                $(#[$doc_15_0_0:meta])*
-                $variant_15_0_0: ident = $value_15_0_0: literal,
-            )*
-
-            --
-
-            $(#[$doc_last_15_0_0:meta])*
-            $variant_last_15_0_0: ident = $value_last_15_0_0: literal,
-        )?
-        $(
-            == MACOS_15_4_0;
-            $(
-                $(#[$doc_15_4_0:meta])*
-                $variant_15_4_0: ident = $value_15_4_0: literal,
-            )*
-
-            --
-
-            $(#[$doc_last_15_4_0:meta])*
-            $variant_last_15_4_0: ident = $value_last_15_4_0: literal,
-        )?
+            $(#[$doc_last_ver:meta])*
+            $variant_last_ver: ident = $value_last_ver: literal,
+        )*
     ) => {
         $(#[$doc_enum])*
         #[repr(transparent)]
@@ -307,197 +211,47 @@ macro_rules! ffi_wrap_enum {
             /// Variants available from macOS 10.15.0 onwards
             impl $enum_name {
                 $(
-                    $(#[$doc_10_15_0])*
-                    pub const $variant_10_15_0: $enum_name = $enum_name($value_10_15_0);
+                    $(#[$doc_first])*
+                    pub const $variant_first: $enum_name = $enum_name($value_first);
                 )*
 
-                $(#[$doc_last_10_15_0])*
+                $(#[$doc_last_first])*
                 ///
                 /// Last value for macOS 10.15.0
-                pub const $variant_last_10_15_0: $enum_name = $enum_name($value_last_10_15_0);
+                pub const $variant_last_first: $enum_name = $enum_name($value_last_first);
 
                 /// Easily identifiable name for the last member of macOS 10.15.0
-                pub const LAST_10_15_0: $enum_name = $enum_name::$variant_last_10_15_0;
+                pub const LAST_10_15_0: $enum_name = $enum_name::$variant_last_first;
             }
         )?
         $(
-            /// Variants available from macOS 10.15.1 onwards
-            #[cfg(feature = "macos_10_15_1")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_10_15_1])*
-                    pub const $variant_10_15_1: $enum_name = $enum_name($value_10_15_1);
-                )*
+            paste::paste! {
+                #[doc = "Variants available from macOS " $ver_str " onwards"]
+                #[cfg(feature = $ver_feature_lit)]
+                impl $enum_name {
+                    $(
+                        $(#[$doc_ver])*
+                        pub const $variant_ver: $enum_name = $enum_name($value_ver);
+                    )*
 
-                $(#[$doc_last_10_15_1])*
-                ///
-                /// Last value for macOS 10.15.1
-                pub const $variant_last_10_15_1: $enum_name = $enum_name($value_last_10_15_1);
+                    $(#[$doc_last_ver])*
+                    ///
+                    #[doc = "Last value for macOS " $ver_str]
+                    pub const $variant_last_ver: $enum_name = $enum_name($value_last_ver);
 
-                /// Easily identifiable name for the last member of macOS 10.15.1
-                pub const LAST_10_15_1: $enum_name = $enum_name::$variant_last_10_15_1;
+                    #[doc = "Easily identifiable name for the last member of macOS " $ver_str]
+                    pub const [<LAST_ $ver_ident>]: $enum_name = $enum_name::$variant_last_ver;
+                }
             }
-        )?
-        $(
-            /// Variants available from macOS 10.15.4 onwards
-            #[cfg(feature = "macos_10_15_4")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_10_15_4])*
-                    pub const $variant_10_15_4: $enum_name = $enum_name($value_10_15_4);
-                )*
-
-                $(#[$doc_last_10_15_4])*
-                ///
-                /// Last value for macOS 10.15.4
-                pub const $variant_last_10_15_4: $enum_name = $enum_name($value_last_10_15_4);
-
-                /// Easily identifiable name for the last member of macOS 10.15.4
-                pub const LAST_10_15_4: $enum_name = $enum_name::$variant_last_10_15_4;
-            }
-        )?
-        $(
-            /// Variants available from macOS 11.0.0 onwards
-            #[cfg(feature = "macos_11_0_0")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_11_0_0])*
-                    pub const $variant_11_0_0: $enum_name = $enum_name($value_11_0_0);
-                )*
-
-                $(#[$doc_last_11_0_0])*
-                ///
-                /// Last value for macOS 11.0.0
-                pub const $variant_last_11_0_0: $enum_name = $enum_name($value_last_11_0_0);
-
-                /// Easily identifiable name for the last member of macOS 11.0.0
-                pub const LAST_11_0_0: $enum_name = $enum_name::$variant_last_11_0_0;
-            }
-        )?
-        $(
-            /// Variants available from macOS 11.3.0 onwards
-            #[cfg(feature = "macos_11_3_0")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_11_3_0])*
-                    pub const $variant_11_3_0: $enum_name = $enum_name($value_11_3_0);
-                )*
-
-                $(#[$doc_last_11_3_0])*
-                ///
-                /// Last value for macOS 11.3.0
-                pub const $variant_last_11_3_0: $enum_name = $enum_name($value_last_11_3_0);
-
-                /// Easily identifiable name for the last member of macOS 11.3.0
-                pub const LAST_11_3_0: $enum_name = $enum_name::$variant_last_11_3_0;
-            }
-        )?
-        $(
-            /// Variants available from macOS 12.0.0 onwards
-            #[cfg(feature = "macos_12_0_0")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_12_0_0])*
-                    pub const $variant_12_0_0: $enum_name = $enum_name($value_12_0_0);
-                )*
-
-                $(#[$doc_last_12_0_0])*
-                ///
-                /// Last value for macOS 12.0.0
-                pub const $variant_last_12_0_0: $enum_name = $enum_name($value_last_12_0_0);
-
-                /// Easily identifiable name for the last member of macOS 12.0.0
-                pub const LAST_12_0_0: $enum_name = $enum_name::$variant_last_12_0_0;
-            }
-        )?
-        $(
-            /// Variants available from macOS 13.0.0 onwards
-            #[cfg(feature = "macos_13_0_0")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_13_0_0])*
-                    pub const $variant_13_0_0: $enum_name = $enum_name($value_13_0_0);
-                )*
-
-                $(#[$doc_last_13_0_0])*
-                ///
-                /// Last value for macOS 13.0.0
-                pub const $variant_last_13_0_0: $enum_name = $enum_name($value_last_13_0_0);
-
-                /// Easily identifiable name for the last member of macOS 13.0.0
-                pub const LAST_13_0_0: $enum_name = $enum_name::$variant_last_13_0_0;
-            }
-        )?
-        $(
-            /// Variants available from macOS 14.0.0 onwards
-            #[cfg(feature = "macos_14_0_0")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_14_0_0])*
-                    pub const $variant_14_0_0: $enum_name = $enum_name($value_14_0_0);
-                )*
-
-                $(#[$doc_last_14_0_0])*
-                ///
-                /// Last value for macOS 14.0.0
-                pub const $variant_last_14_0_0: $enum_name = $enum_name($value_last_14_0_0);
-
-                /// Easily identifiable name for the last member of macOS 14.0.0
-                pub const LAST_14_0_0: $enum_name = $enum_name::$variant_last_14_0_0;
-            }
-        )?
-        $(
-            /// Variants available from macOS 15.0.0 onwards
-            #[cfg(feature = "macos_15_0_0")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_15_0_0])*
-                    pub const $variant_15_0_0: $enum_name = $enum_name($value_15_0_0);
-                )*
-
-                $(#[$doc_last_15_0_0])*
-                ///
-                /// Last value for macOS 15.0.0
-                pub const $variant_last_15_0_0: $enum_name = $enum_name($value_last_15_0_0);
-
-                /// Easily identifiable name for the last member of macOS 15.0.0
-                pub const LAST_15_0_0: $enum_name = $enum_name::$variant_last_15_0_0;
-            }
-        )?
-        $(
-            /// Variants available from macOS 15.4.0 onwards
-            #[cfg(feature = "macos_15_4_0")]
-            impl $enum_name {
-                $(
-                    $(#[$doc_15_4_0])*
-                    pub const $variant_15_4_0: $enum_name = $enum_name($value_15_4_0);
-                )*
-
-                $(#[$doc_last_15_4_0])*
-                ///
-                /// Last value for macOS 15.4.0
-                pub const $variant_last_15_4_0: $enum_name = $enum_name($value_last_15_4_0);
-
-                /// Easily identifiable name for the last member of macOS 15.4.0
-                pub const LAST_15_4_0: $enum_name = $enum_name::$variant_last_15_4_0;
-            }
-        )?
+        )*
 
         impl $enum_name {
             const __COMPUTED_LAST_VARIANT: $enum_name = $enum_name({
                 const LAST_VALUE: $enum_name = match &[
-                    $(#[cfg(feature = "macos_15_4_0")] $enum_name::$variant_last_15_4_0,)?
-                    $(#[cfg(feature = "macos_15_0_0")] $enum_name::$variant_last_15_0_0,)?
-                    $(#[cfg(feature = "macos_14_0_0")] $enum_name::$variant_last_14_0_0,)?
-                    $(#[cfg(feature = "macos_13_0_0")] $enum_name::$variant_last_13_0_0,)?
-                    $(#[cfg(feature = "macos_12_0_0")] $enum_name::$variant_last_12_0_0,)?
-                    $(#[cfg(feature = "macos_11_3_0")] $enum_name::$variant_last_11_3_0,)?
-                    $(#[cfg(feature = "macos_11_0_0")] $enum_name::$variant_last_11_0_0,)?
-                    $(#[cfg(feature = "macos_10_15_4")] $enum_name::$variant_last_10_15_4,)?
-                    $(#[cfg(feature = "macos_10_15_1")] $enum_name::$variant_last_10_15_1,)?
-                    $($enum_name::$variant_last_10_15_0,)?
+                    $($enum_name::$variant_last_first,)?
+                    $(#[cfg(feature = $ver_feature_lit)] $enum_name::$variant_last_ver,)?
                 ] {
-                    [first, ..] => *first,
+                    [.., last] => *last,
                 };
 
                 LAST_VALUE.0 + 1
@@ -505,7 +259,7 @@ macro_rules! ffi_wrap_enum {
 
             $(
                 /// Not a real instance but a convenience value for operating on the range of defined
-                /// variants This was available starting in macos 10.15.0.
+                /// variants.
                 ///
                 /// It can be used to ensure that, even on newer versions of Endpoint Security, you do not
                 /// crash on unknown variants: if the variant value is superior or equal to this value (set
@@ -520,83 +274,19 @@ macro_rules! ffi_wrap_enum {
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                 match *self {
                     $($(
-                        Self::$variant_10_15_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_10_15_0($value_10_15_0)),
+                        Self::$variant_first => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_first($value_first)),
                     )*)?
                     $(
-                        Self::$variant_last_10_15_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_10_15_0($value_last_10_15_0)),
+                        Self::$variant_last_first => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_first($value_last_first)),
                     )?
-                    $($(
-                        #[cfg(feature = "macos_10_15_1")]
-                        Self::$variant_10_15_1 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_10_15_1($value_10_15_1)),
-                    )*)?
                     $(
-                        #[cfg(feature = "macos_10_15_1")]
-                        Self::$variant_last_10_15_1 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_10_15_1($value_last_10_15_1)),
-                    )?
-                    $($(
-                        #[cfg(feature = "macos_10_15_4")]
-                        Self::$variant_10_15_4 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_10_15_4($value_10_15_4)),
-                    )*)?
-                    $(
-                        #[cfg(feature = "macos_10_15_4")]
-                        Self::$variant_last_10_15_4 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_10_15_4($value_last_10_15_4)),
-                    )?
-                    $($(
-                        #[cfg(feature = "macos_11_0_0")]
-                        Self::$variant_11_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_11_0_0($value_11_0_0)),
-                    )*)?
-                    $(
-                        #[cfg(feature = "macos_11_0_0")]
-                        Self::$variant_last_11_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_11_0_0($value_last_11_0_0)),
-                    )?
-                    $($(
-                        #[cfg(feature = "macos_11_3_0")]
-                        Self::$variant_11_3_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_11_3_0($value_11_3_0)),
-                    )*)?
-                    $(
-                        #[cfg(feature = "macos_11_3_0")]
-                        Self::$variant_last_11_3_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_11_3_0($value_last_11_3_0)),
-                    )?
-                    $($(
-                        #[cfg(feature = "macos_12_0_0")]
-                        Self::$variant_12_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_12_0_0($value_12_0_0)),
-                    )*)?
-                    $(
-                        #[cfg(feature = "macos_12_0_0")]
-                        Self::$variant_last_12_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_12_0_0($value_last_12_0_0)),
-                    )?
-                    $($(
-                        #[cfg(feature = "macos_13_0_0")]
-                        Self::$variant_13_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_13_0_0($value_13_0_0)),
-                    )*)?
-                    $(
-                        #[cfg(feature = "macos_13_0_0")]
-                        Self::$variant_last_13_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_13_0_0($value_last_13_0_0)),
-                    )?
-                    $($(
-                        #[cfg(feature = "macos_14_0_0")]
-                        Self::$variant_14_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_14_0_0($value_14_0_0)),
-                    )*)?
-                    $(
-                        #[cfg(feature = "macos_14_0_0")]
-                        Self::$variant_last_14_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_14_0_0($value_last_14_0_0)),
-                    )?
-                    $($(
-                        #[cfg(feature = "macos_15_0_0")]
-                        Self::$variant_15_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_15_0_0($value_15_0_0)),
-                    )*)?
-                    $(
-                        #[cfg(feature = "macos_15_0_0")]
-                        Self::$variant_last_15_0_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_15_0_0($value_last_15_0_0)),
-                    )?
-                    $($(
-                        #[cfg(feature = "macos_15_4_0")]
-                        Self::$variant_15_4_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_15_4_0($value_15_4_0)),
-                    )*)?
-                    $(
-                        #[cfg(feature = "macos_15_4_0")]
-                        Self::$variant_last_15_4_0 => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_15_4_0($value_last_15_4_0)),
-                    )?
+                        $(
+                            #[cfg(feature = $ver_feature_lit)]
+                            Self::$variant_ver => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_ver($value_ver)),
+                        )*
+                        #[cfg(feature = $ver_feature_lit)]
+                        Self::$variant_last_ver => ffi_wrap_enum!(DEBUG f, $enum_name::$variant_last_ver($value_last_ver)),
+                    )*
                     $(
                         Self::$variant_last => ::core::write!(
                             f, ::core::concat!(::core::stringify!($enum_name), "::", ::core::stringify!($variant_last), "({})"), self.0

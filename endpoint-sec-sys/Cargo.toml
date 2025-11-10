@@ -37,6 +37,7 @@ block2.workspace = true
 libc.workspace = true
 mach2.workspace = true
 objc2.workspace = true
+paste.workspace = true
 
 [package.metadata.docs.rs]
 features = ["max"]
