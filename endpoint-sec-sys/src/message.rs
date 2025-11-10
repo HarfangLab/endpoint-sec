@@ -31,6 +31,8 @@ use super::{es_address_type_t, es_authentication_type_t};
 use super::{
     es_authorization_rule_class_t, es_od_account_type_t, es_od_member_type_t, es_od_record_type_t, es_xpc_domain_type_t,
 };
+#[cfg(feature = "macos_15_0_0")]
+use super::{es_gatekeeper_user_override_file_type_t, es_sha256_t, es_signed_file_info_t};
 
 /// Provides the [`stat`][struct@stat] information and path to a file that relates to a security
 /// event. The path may be truncated, which is indicated by the `path_truncated` flag.
@@ -2757,6 +2759,45 @@ pub struct es_event_xpc_connect_t {
     pub service_domain_type: es_xpc_domain_type_t,
 }
 
+/// See [`es_event_gatekeeper_user_override_t`]
+#[cfg(feature = "macos_15_0_0")]
+#[repr(C)]
+pub union es_event_gatekeeper_user_override_t_anon0 {
+    pub file_path: ManuallyDrop<es_string_token_t>,
+    pub file: ShouldNotBeNull<es_file_t>,
+}
+
+/// Notification for a gatekeeper_user_override event.
+///
+/// This event type does not support caching (notify-only).
+///
+/// Hashes are calculated in usermode by Gatekeeper. There is no guarantee that
+/// any other program including the kernel will observe the same file at the
+/// reported path. Furthermore, there is no guarantee that the CDHash is valid
+/// or that it matches the containing binary.
+#[cfg(feature = "macos_15_0_0")]
+#[repr(C)]
+pub struct es_event_gatekeeper_user_override_t {
+    /// The type of the file field.
+    ///
+    /// If Endpoint security can't lookup the file at event submission it will
+    /// emit a path instead of an es_file_t.
+    pub file_type: es_gatekeeper_user_override_file_type_t,
+    /// Describes the target file that is being overridden by the user.
+    pub file: es_event_gatekeeper_user_override_t_anon0,
+    /// SHA256 of the file. Provided if the filesize is less than 100MB.
+    pub sha256: *mut es_sha256_t,
+    /// Signing Information, available if the file has been signed.
+    pub signing_info: *mut es_signed_file_info_t,
+}
+
+#[cfg(feature = "macos_15_0_0")]
+null_fields!(
+    es_event_gatekeeper_user_override_t;
+    sha256 -> es_sha256_t,
+    signing_info -> es_signed_file_info_t
+);
+
 /// Union of all possible events that can appear in an [`es_message_t`]
 #[repr(C)]
 pub union es_events_t {
@@ -2957,6 +2998,10 @@ pub union es_events_t {
     pub od_delete_group: ShouldNotBeNull<es_event_od_delete_group_t>,
     #[cfg(feature = "macos_14_0_0")]
     pub xpc_connect: ShouldNotBeNull<es_event_xpc_connect_t>,
+
+    // 15.0.0
+    #[cfg(feature = "macos_15_0_0")]
+    pub gatekeeper_user_override: ShouldNotBeNull<es_event_gatekeeper_user_override_t>,
 }
 
 /// Indicates the result of the ES subsystem authorization process
@@ -3071,6 +3116,7 @@ pub union es_result_t_anon_0 {
 /// - [`ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP`]
 /// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER`]
 /// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP`]
+/// - [`ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE`]
 #[repr(C)]
 pub struct es_message_t {
     /// Indicates the message version; some fields are not available and must not be accessed unless

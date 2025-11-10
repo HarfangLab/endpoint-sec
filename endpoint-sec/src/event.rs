@@ -377,6 +377,10 @@ define_event_enum!(
         ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP => NotifyOdDeleteGroup (EventOdDeleteGroup [_ => None] { raw: raw_event.od_delete_group.as_opt()?, version, }),
         /// Notification for an XPC connection being established to a named service.
         ES_EVENT_TYPE_NOTIFY_XPC_CONNECT => NotifyXpcConnect (EventXpcConnect [_ => None] { raw: raw_event.xpc_connect.as_opt()?, }),
+
+        == #[cfg(feature = "macos_15_0_0")]
+        /// Notification for a gatekeeper_user_override event.
+        ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE => NotifyGatekeeperUserOverride (EventGatekeeperUserOverride [_ => None] { raw: raw_event.gatekeeper_user_override.as_opt()?, }),
     }
 );
 
@@ -645,4 +649,7 @@ cfg_mod! {
     mod event_od_delete_user;
     mod event_od_delete_group;
     mod event_xpc_connect;
+
+    == #[cfg(feature = "macos_15_0_0")];
+    mod event_gatekeeper_user_override;
 }
