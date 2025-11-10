@@ -82,7 +82,7 @@ define_event_enum!(
         /// Authorization request for a change of protection for pages.
         ES_EVENT_TYPE_AUTH_MPROTECT => AuthMprotect(EventMprotect [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.mprotect, }),
         /// Authorization request for a file system being mounted.
-        ES_EVENT_TYPE_AUTH_MOUNT => AuthMount(EventMount [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.mount, }),
+        ES_EVENT_TYPE_AUTH_MOUNT => AuthMount(EventMount [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.mount, version, }),
         /// Authorization request for a file system object being renamed.
         ES_EVENT_TYPE_AUTH_RENAME => AuthRename(EventRename [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.rename, }),
         /// Authorization request for a signal being sent to a process.
@@ -116,7 +116,7 @@ define_event_enum!(
         /// Notify a change of protection for pages.
         ES_EVENT_TYPE_NOTIFY_MPROTECT => NotifyMprotect(EventMprotect [_ => None ] { raw: &raw_event.mprotect, }),
         /// Notify a file system being mounted.
-        ES_EVENT_TYPE_NOTIFY_MOUNT => NotifyMount(EventMount [_ => None ] { raw: &raw_event.mount, }),
+        ES_EVENT_TYPE_NOTIFY_MOUNT => NotifyMount(EventMount [_ => None ] { raw: &raw_event.mount, version, }),
         /// Notify a file system being unmounted.
         ES_EVENT_TYPE_NOTIFY_UNMOUNT => NotifyUnmount(EventUnmount [_ => None ] { raw: &raw_event.unmount, }),
         /// Notify a connection being opened to an I/O Kit IOService.
@@ -274,9 +274,9 @@ define_event_enum!(
         /// Notify for the recuperation of a process's task name port.
         ES_EVENT_TYPE_NOTIFY_REMOTE_THREAD_CREATE => NotifyRemoteThreadCreate( EventRemoteThreadCreate [_ => None ] { raw: &raw_event.remote_thread_create, version, } ),
         /// Notify for an attempt to attach another process.
-        ES_EVENT_TYPE_AUTH_REMOUNT => AuthRemount(EventRemount [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.remount, }),
+        ES_EVENT_TYPE_AUTH_REMOUNT => AuthRemount(EventRemount [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.remount, version, }),
         /// Notify a process has attempted to create a thread in another process.
-        ES_EVENT_TYPE_NOTIFY_REMOUNT => NotifyRemount(EventRemount [_ => None ] { raw: &raw_event.remount, }),
+        ES_EVENT_TYPE_NOTIFY_REMOUNT => NotifyRemount(EventRemount [_ => None ] { raw: &raw_event.remount, version, }),
 
         == #[cfg(feature = "macos_11_3_0")]
         /// Authorization request for a file system being remounted.

@@ -508,6 +508,29 @@ pub struct es_event_link_t {
 
 should_not_be_null_fields!(es_event_link_t; source -> es_file_t, target_dir -> es_file_t);
 
+#[cfg(feature = "macos_15_0_0")]
+ffi_wrap_enum!(
+    /// The type of device being mounted.
+    ///
+    /// See [`es_event_mount_t`]
+    es_mount_disposition_t(u32);
+
+    == MACOS_15_0_0;
+    /// Device is external storage.
+    ES_MOUNT_DISPOSITION_EXTERNAL = 0,
+    /// Device is internal storage.
+    ES_MOUNT_DISPOSITION_INTERNAL = 1,
+    /// Device is a network share.
+    ES_MOUNT_DISPOSITION_NETWORK = 2,
+    /// Device is virtual (dmg or file).
+    ES_MOUNT_DISPOSITION_VIRTUAL = 3,
+    /// Mount uses nullfs, commonly for app translocation
+    ES_MOUNT_DISPOSITION_NULLFS = 4,
+    --
+    /// unable to determine disposition
+    ES_MOUNT_DISPOSITION_UNKNOWN = 5,
+);
+
 /// Mount a file system
 ///
 /// Cache key for this event type: `(process executable file, mount point)`.
@@ -516,7 +539,12 @@ should_not_be_null_fields!(es_event_link_t; source -> es_file_t, target_dir -> e
 pub struct es_event_mount_t {
     /// The file system stats for the file system being mounted
     pub statfs: ShouldNotBeNull<statfs>,
-    _reserved: [u8; 64],
+    /// The device disposition of the f_mntfromname.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub disposition: es_mount_disposition_t,
+    _reserved: [u8; 60],
 }
 
 should_not_be_null_fields!(es_event_mount_t; statfs -> statfs);
@@ -542,7 +570,17 @@ should_not_be_null_fields!(es_event_unmount_t; statfs -> statfs);
 pub struct es_event_remount_t {
     /// The file system stats for the file system being remounted
     pub statfs: ShouldNotBeNull<statfs>,
-    _reserved: [u8; 64],
+    /// The provided remount flags.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub remount_flags: u64,
+    /// The device disposition of the f_mntfromname.
+    ///
+    /// Field available only if message version >= 8.
+    #[cfg(feature = "macos_15_0_0")]
+    pub disposition: es_mount_disposition_t,
+    _reserved: [u8; 52],
 }
 
 #[cfg(feature = "macos_10_15_1")]
