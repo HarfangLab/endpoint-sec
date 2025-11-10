@@ -324,6 +324,10 @@ ffi_wrap_enum!(
     ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP = 144,
     --
     ES_EVENT_TYPE_NOTIFY_XPC_CONNECT = 145,
+
+    == MACOS_15_0_0;
+    --
+    ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE = 146,
 );
 
 ffi_wrap_enum!(
@@ -441,6 +445,9 @@ ffi_wrap_enum!(
 /// observed by the kernel and that the pages actually executed have not been
 /// modified.
 pub type es_cdhash_t = [u8; 20];
+
+/// Binary Sha256 Digest
+pub type es_sha256_t = [u8; 32];
 
 /// Structure buffer with size
 #[repr(C)]
@@ -663,3 +670,32 @@ ffi_wrap_enum!(
     --
     ES_OD_RECORD_TYPE_GROUP = 1,
 );
+
+#[cfg(feature = "macos_15_0_0")]
+ffi_wrap_enum!(
+    es_gatekeeper_user_override_file_type_t(u32);
+
+    == MACOS_15_0_0;
+    /// Signals that file is a string of a path since file could not be resolved
+    /// on disk at time of event submission
+    ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_PATH = 0,
+    --
+    /// Signals that file is a es_file_t
+    ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_FILE = 1,
+);
+
+/// Information from a signed file.
+///
+/// If the file is a multiarchitecture binary, only the information for the
+/// native host architecture is reported. I.e. the CDHash from the AArch64 slice
+/// if the host is AArch64.
+#[cfg(feature = "macos_15_0_0")]
+#[repr(C)]
+pub struct es_signed_file_info_t {
+    /// Code Directory Hash
+    pub cdhash: es_cdhash_t,
+    /// Signing Identifier, if available in the signing information.
+    pub signing_id: es_string_token_t,
+    /// Team Identifier, if available in the signing information.
+    pub team_id: es_string_token_t,
+}
