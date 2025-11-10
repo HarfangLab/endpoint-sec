@@ -23,6 +23,7 @@ jobs:
         version:
         - { name: Stable, value: stable }
         feature:
+          - macos_15_4_0
           - macos_15_0_0
           - macos_14_0_0
           - macos_13_3_0
@@ -165,7 +166,7 @@ jobs:
         - { version: "13", feature: macos_12_0_0 }
         - { version: "13", feature: macos_13_3_0 }
         - { version: "14", feature: macos_14_0_0 }
-        - { version: "15", feature: macos_15_0_0 }
+        - { version: "15", feature: macos_15_4_0 }
 
     steps:
       - name: checkout sources
