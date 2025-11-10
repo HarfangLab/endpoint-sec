@@ -433,6 +433,10 @@ should_not_be_null_fields!(es_event_open_t; file -> es_file_t);
 /// Load a kernel extension
 ///
 /// This event type does not support caching.
+///
+/// Not all AUTH_KEXTLOAD events can be delivered. In rare circumstances, when
+/// kextloading is blocking all userspace execution it will be automatically
+/// allowed. NOTIFY_KEXTLOAD will still be (eventually) delivered.
 #[repr(C)]
 // 10.15.0
 pub struct es_event_kextload_t {
