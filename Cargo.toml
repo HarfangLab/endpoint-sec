@@ -18,7 +18,7 @@ endpoint-sec-sys = { version = "0.4.0", path = "./endpoint-sec-sys" }
 # External - Required
 block2 = "0.6"
 libc = { version = "0.2", features = ["extra_traits"] }
-mach2 = "0.5"
+mach2 = "0.6"
 objc2 = "0.6"
 static_assertions = "1.1"
 
