@@ -155,14 +155,14 @@ jobs:
         # Only build older macOS on the MSRV, since that's the likely use case
         - { name: MSRV, value: "1.71.0" }
         os:
-        # There are no 10.15, 11.3, nor 12 runners anymore.
+        # There are no 10.15, 11.3, 12, nor 13 runners anymore.
         # To avoid reaching the Github Actions limits, we only test for the
         # latest version of Endpoint Security on the OS version, e.g. 13.3 for
         # macOS 13.
-        - { version: "13", feature: macos_10_15_4 }
-        - { version: "13", feature: macos_11_3_0 }
-        - { version: "13", feature: macos_12_0_0 }
-        - { version: "13", feature: macos_13_3_0 }
+        - { version: "14", feature: macos_10_15_4 }
+        - { version: "14", feature: macos_11_3_0 }
+        - { version: "14", feature: macos_12_0_0 }
+        - { version: "14", feature: macos_13_3_0 }
         - { version: "14", feature: macos_14_0_0 }
 
     steps:
