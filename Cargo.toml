@@ -23,5 +23,5 @@ objc2 = "0.6"
 static_assertions = "1.1"
 
 # External - For tests
-sysinfo = "0.28"
+sysinfo = "0.38"
 trybuild = "1.0"
