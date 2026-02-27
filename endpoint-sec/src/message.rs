@@ -436,7 +436,7 @@ impl<'a> Process<'a> {
 
     /// Code directory hash of the code signature associated with this process.
     #[inline(always)]
-    pub fn cdhash(&self) -> [u8; 20] {
+    pub fn cdhash(&self) -> es_cdhash_t {
         self.raw.cdhash
     }
 

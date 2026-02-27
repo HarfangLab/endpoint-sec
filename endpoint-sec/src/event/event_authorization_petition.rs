@@ -4,7 +4,7 @@ use std::ffi::OsStr;
 
 use endpoint_sec_sys::{es_event_authorization_petition_t, es_string_token_t};
 
-use crate::Process;
+use crate::{AuditToken, Process};
 
 /// Notification that a process petitioned for certain authorization rights
 #[doc(alias = "es_event_authorization_petition_t")]
@@ -18,9 +18,22 @@ pub struct EventAuthorizationPetition<'a> {
 impl<'a> EventAuthorizationPetition<'a> {
     /// Process that submitted the petition (XPC caller)
     #[inline(always)]
-    pub fn instigator(&self) -> Process<'a> {
+    pub fn instigator(&self) -> Option<Process<'a>> {
         // Safety: 'a tied to self, object obtained through ES
-        Process::new(unsafe { self.raw.instigator.as_ref() }, self.version)
+        let process = unsafe { self.raw.instigator()? };
+        Some(Process::new(process, self.version))
+    }
+
+    /// Audit token of the process that instigated this event.
+    pub fn instigator_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.instigator_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.instigator().unwrap().audit_token()
     }
 
     /// Process that created the petition
@@ -31,6 +44,18 @@ impl<'a> EventAuthorizationPetition<'a> {
             unsafe { self.raw.petitioner.as_ref()? },
             self.version,
         ))
+    }
+
+    /// Audit token of the process that created the petition.
+    pub fn petitioner_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.petitioner_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.petitioner().unwrap().audit_token()
     }
 
     /// Flags associated with the petition. Defined in Security framework "Authorization/Authorization.h"
@@ -57,7 +82,7 @@ unsafe impl Send for EventAuthorizationPetition<'_> {}
 // Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Sync for EventAuthorizationPetition<'_> {}
 
-impl_debug_eq_hash_with_functions!(EventAuthorizationPetition<'a> with version; instigator, petitioner, flags, right_count);
+impl_debug_eq_hash_with_functions!(EventAuthorizationPetition<'a> with version; instigator, instigator_token, petitioner, petitioner_token, flags, right_count);
 
 /// Read the `idx` right of `raw`
 ///

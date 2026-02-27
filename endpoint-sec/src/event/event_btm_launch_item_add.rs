@@ -4,7 +4,7 @@ use std::ffi::OsStr;
 
 use endpoint_sec_sys::{es_btm_item_type_t, es_btm_launch_item_t, es_event_btm_launch_item_add_t, uid_t};
 
-use crate::Process;
+use crate::{AuditToken, Process};
 
 /// A launch item being made known to background task management.
 #[doc(alias = "es_event_btm_launch_item_add_t")]
@@ -25,12 +25,38 @@ impl<'a> EventBtmLaunchItemAdd<'a> {
         Some(Process::new(process, self.version))
     }
 
+    /// Audit token of the process that instigated this event.
+    pub fn instigator_token(&self) -> Option<AuditToken> {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            // Safety: 'a tied to self, object obtained through ES
+            let token = unsafe { self.raw.instigator_token() };
+            return token.map(|v| AuditToken(*v));
+        }
+
+        // On older version, grab it from the instigator object.
+        self.instigator().map(|v| v.audit_token())
+    }
+
     /// Optional. App process that registered the item.
     #[inline(always)]
     pub fn app(&self) -> Option<Process<'a>> {
         // Safety: 'a tied to self, object obtained through ES
         let process = unsafe { self.raw.app()? };
         Some(Process::new(process, self.version))
+    }
+
+    /// Audit token of the process that instigated this event.
+    pub fn app_token(&self) -> Option<AuditToken> {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            // Safety: 'a tied to self, object obtained through ES
+            let token = unsafe { self.raw.app_token() };
+            return token.map(|v| AuditToken(*v));
+        }
+
+        // On older version, grab it from the instigator object.
+        self.app().map(|v| v.audit_token())
     }
 
     /// BTM launch item.
@@ -56,7 +82,7 @@ unsafe impl Sync for EventBtmLaunchItemAdd<'_> {}
 
 impl_debug_eq_hash_with_functions!(
     EventBtmLaunchItemAdd<'a>;
-    instigator, app, item, executable_path,
+    instigator, instigator_token, app, app_token, item, executable_path,
 );
 
 /// A BTM launch item

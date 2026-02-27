@@ -106,7 +106,7 @@ ffi_wrap_enum!(
     /// This enum describes the types of XPC service domains.
     es_xpc_domain_type_t(u32);
 
-    == MACOS_14_0_0;
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
     ES_XPC_DOMAIN_TYPE_SYSTEM = 1,
     ES_XPC_DOMAIN_TYPE_USER = 2,
     ES_XPC_DOMAIN_TYPE_USER_LOGIN = 3,
@@ -129,12 +129,27 @@ ffi_wrap_enum!(
     // value to operate on the range of defined authentication types.
     ES_AUTHENTICATION_TYPE_LAST,
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     ES_AUTHENTICATION_TYPE_OD = 0,
     ES_AUTHENTICATION_TYPE_TOUCHID = 1,
     ES_AUTHENTICATION_TYPE_TOKEN = 2,
     --
     ES_AUTHENTICATION_TYPE_AUTO_UNLOCK = 3,
+);
+
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// Describes the type of plugin types in sudo.
+    es_sudo_plugin_type_t(u32);
+
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
+    ES_SUDO_PLUGIN_TYPE_UNKNOWN = 0,
+    ES_SUDO_PLUGIN_TYPE_FRONT_END = 1,
+    ES_SUDO_PLUGIN_TYPE_POLICY = 2,
+    ES_SUDO_PLUGIN_TYPE_IO = 3,
+    ES_SUDO_PLUGIN_TYPE_AUDIT = 4,
+    --
+    ES_SUDO_PLUGIN_TYPE_APPROVAL = 5,
 );
 
 ffi_wrap_enum!(
@@ -208,7 +223,7 @@ ffi_wrap_enum!(
     --
     ES_EVENT_TYPE_AUTH_SETOWNER = 49,
 
-    == MACOS_10_15_1;
+    == #[cfg(feature = "macos_10_15_1")] 10_15_1 "10.15.1";
     ES_EVENT_TYPE_AUTH_CHDIR = 50,
     ES_EVENT_TYPE_NOTIFY_CHDIR = 51,
     ES_EVENT_TYPE_AUTH_GETATTRLIST = 52,
@@ -244,7 +259,7 @@ ffi_wrap_enum!(
     --
     ES_EVENT_TYPE_NOTIFY_SETACL = 82,
 
-    == MACOS_10_15_4;
+    == #[cfg(feature = "macos_10_15_4")] 10_15_4 "10.15.4";
     ES_EVENT_TYPE_NOTIFY_PTY_GRANT = 83,
     ES_EVENT_TYPE_NOTIFY_PTY_CLOSE = 84,
     ES_EVENT_TYPE_AUTH_PROC_CHECK = 85,
@@ -252,7 +267,7 @@ ffi_wrap_enum!(
     --
     ES_EVENT_TYPE_AUTH_GET_TASK = 87,
 
-    == MACOS_11_0_0;
+    == #[cfg(feature = "macos_11_0_0")] 11_0_0 "11.0.0";
     ES_EVENT_TYPE_AUTH_SEARCHFS = 88,
     ES_EVENT_TYPE_NOTIFY_SEARCHFS = 89,
     ES_EVENT_TYPE_AUTH_FCNTL = 90,
@@ -267,13 +282,13 @@ ffi_wrap_enum!(
     --
     ES_EVENT_TYPE_NOTIFY_REMOUNT = 99,
 
-    == MACOS_11_3_0;
+    == #[cfg(feature = "macos_11_3_0")] 11_3_0 "11.3.0";
     ES_EVENT_TYPE_AUTH_GET_TASK_READ = 100,
     ES_EVENT_TYPE_NOTIFY_GET_TASK_READ = 101,
     --
     ES_EVENT_TYPE_NOTIFY_GET_TASK_INSPECT = 102,
 
-    == MACOS_12_0_0;
+    == #[cfg(feature = "macos_12_0_0")] 12_0_0 "12.0.0";
     ES_EVENT_TYPE_NOTIFY_SETUID = 103,
     ES_EVENT_TYPE_NOTIFY_SETGID = 104,
     ES_EVENT_TYPE_NOTIFY_SETEUID = 105,
@@ -284,7 +299,7 @@ ffi_wrap_enum!(
     --
     ES_EVENT_TYPE_NOTIFY_COPYFILE = 110,
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     ES_EVENT_TYPE_NOTIFY_AUTHENTICATION = 111,
     ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED = 112,
     ES_EVENT_TYPE_NOTIFY_XP_MALWARE_REMEDIATED = 113,
@@ -302,7 +317,7 @@ ffi_wrap_enum!(
     --
     ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE = 125,
 
-    == MACOS_14_0_0;
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
     ES_EVENT_TYPE_NOTIFY_PROFILE_ADD = 126,
     ES_EVENT_TYPE_NOTIFY_PROFILE_REMOVE = 127,
     ES_EVENT_TYPE_NOTIFY_SU = 128,
@@ -324,6 +339,14 @@ ffi_wrap_enum!(
     ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP = 144,
     --
     ES_EVENT_TYPE_NOTIFY_XPC_CONNECT = 145,
+
+    == #[cfg(feature = "macos_15_0_0")] 15_0_0 "15.0.0";
+    --
+    ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE = 146,
+
+    == #[cfg(feature = "macos_15_4_0")] 15_4_0 "15.4.0";
+    --
+    ES_EVENT_TYPE_NOTIFY_TCC_MODIFY = 147,
 );
 
 ffi_wrap_enum!(
@@ -406,7 +429,7 @@ ffi_wrap_enum!(
     /// The caller is not running as root.
     ES_NEW_CLIENT_RESULT_ERR_NOT_PRIVILEGED = 5,
 
-    == MACOS_10_15_1;
+    == #[cfg(feature = "macos_10_15_1")] 10_15_1 "10.15.1";
     --
     /// The caller has reached the maximum number of allowed simultaneously connected clients.
     ES_NEW_CLIENT_RESULT_ERR_TOO_MANY_CLIENTS = 6,
@@ -425,6 +448,25 @@ ffi_wrap_enum!(
     /// Rate of calls is too high. Slow down.
     ES_CLEAR_CACHE_RESULT_ERR_THROTTLE = 2,
 );
+
+/// Binary CDHash
+///
+/// The Code Directory Hash (CDHash) is a hash of hashes, covering a macho or
+/// an entire application bundle.
+/// The Code Directory contains the hash of each executable page in the main
+/// executable. Only when:
+///
+/// - The subject process has opted into the hardened runtime (CS_HARD/CS_KILL)
+///   - The subject process is not being debugged
+/// - The subject process is running
+///
+/// is it guaranteed that the ES provided cdhash value matches the binary
+/// observed by the kernel and that the pages actually executed have not been
+/// modified.
+pub type es_cdhash_t = [u8; 20];
+
+/// Binary Sha256 Digest
+pub type es_sha256_t = [u8; 32];
 
 /// Structure buffer with size
 #[repr(C)]
@@ -486,7 +528,7 @@ ffi_wrap_enum!(
     /// Value to describe a path literal
     ES_MUTE_PATH_TYPE_LITERAL = 1,
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     /// Value to describe a target path prefix
     ES_MUTE_PATH_TYPE_TARGET_PREFIX = 2,
     --
@@ -549,7 +591,7 @@ ffi_wrap_enum!(
     /// Type of a network address.
     es_address_type_t(u32);
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     /// No source address available.
     ES_ADDRESS_TYPE_NONE = 0,
     /// Source address is IPv4.
@@ -564,8 +606,8 @@ ffi_wrap_enum!(
 #[cfg(feature = "macos_13_0_0")]
 ffi_wrap_enum!(
     es_mute_inversion_type_t(u32);
-    == MACOS_13_0_0;
 
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     ES_MUTE_INVERSION_TYPE_PROCESS = 0,
     ES_MUTE_INVERSION_TYPE_PATH = 1,
     ES_MUTE_INVERSION_TYPE_TARGET_PATH = 2,
@@ -578,7 +620,7 @@ ffi_wrap_enum!(
     /// Return type for mute inversion
     es_mute_inverted_return_t(u32);
 
-    == MACOS_13_0_0;
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
     /// The type of muted queried was inverted
     ES_MUTE_INVERTED = 0,
     /// The type of muted queried was not inverted
@@ -593,7 +635,7 @@ ffi_wrap_enum!(
     /// The class of rules used to evaluate the petition for a specific authorization right
     es_authorization_rule_class_t(u32);
 
-    == MACOS_14_0_0;
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
     /// Right is judged on user properties
     ES_AUTHORIZATION_RULE_CLASS_USER = 0,
     /// Right is judged by a tree of sub-rules
@@ -616,7 +658,7 @@ ffi_wrap_enum!(
     /// Type of a group member, used in OpenDirectory (od) events
     es_od_member_type_t(u32);
 
-    == MACOS_14_0_0;
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
     /// Group member is a user, designated by name
     ES_OD_MEMBER_TYPE_USER_NAME = 0,
     /// Group member is a user, designated by UUID
@@ -631,7 +673,7 @@ ffi_wrap_enum!(
     /// Type of an account, used in OpenDirectory (od) events
     es_od_account_type_t(u32);
 
-    == MACOS_14_0_0;
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
     ES_OD_ACCOUNT_TYPE_USER = 0,
     --
     ES_OD_ACCOUNT_TYPE_COMPUTER = 1,
@@ -642,8 +684,111 @@ ffi_wrap_enum!(
     /// Type of a record, used in OpenDirectory (od) events
     es_od_record_type_t(u32);
 
-    == MACOS_14_0_0;
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
     ES_OD_RECORD_TYPE_USER = 0,
     --
     ES_OD_RECORD_TYPE_GROUP = 1,
+);
+
+#[cfg(feature = "macos_15_0_0")]
+ffi_wrap_enum!(
+    es_gatekeeper_user_override_file_type_t(u32);
+
+    == #[cfg(feature = "macos_15_0_0")] 15_0_0 "15.0.0";
+    /// Signals that file is a string of a path since file could not be resolved
+    /// on disk at time of event submission
+    ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_PATH = 0,
+    --
+    /// Signals that file is a es_file_t
+    ES_GATEKEEPER_USER_OVERRIDE_FILE_TYPE_FILE = 1,
+);
+
+/// Information from a signed file.
+///
+/// If the file is a multiarchitecture binary, only the information for the
+/// native host architecture is reported. I.e. the CDHash from the AArch64 slice
+/// if the host is AArch64.
+#[cfg(feature = "macos_15_0_0")]
+#[repr(C)]
+pub struct es_signed_file_info_t {
+    /// Code Directory Hash
+    pub cdhash: es_cdhash_t,
+    /// Signing Identifier, if available in the signing information.
+    pub signing_id: es_string_token_t,
+    /// Team Identifier, if available in the signing information.
+    pub team_id: es_string_token_t,
+}
+
+#[cfg(feature = "macos_15_4_0")]
+ffi_wrap_enum!(
+    /// Represent the type of TCC modification event.
+    es_tcc_event_type_t(u32);
+
+    == #[cfg(feature = "macos_15_4_0")] 15_4_0 "15.4.0";
+    /// Unknown prior state.
+    ES_TCC_EVENT_TYPE_UNKNOWN = 0,
+    /// A new TCC authorization record was created.
+    ES_TCC_EVENT_TYPE_CREATE = 1,
+    /// An existing TCC authorization record was modified.
+    ES_TCC_EVENT_TYPE_MODIFY = 2,
+    --
+    /// An existing TCC authorization record was deleted.
+    ES_TCC_EVENT_TYPE_DELETE = 3,
+);
+
+#[cfg(feature = "macos_15_4_0")]
+ffi_wrap_enum!(
+    /// Represents the type of authorization permission an application has to a
+    /// TCC Service.
+     es_tcc_authorization_right_t(u32);
+
+    == #[cfg(feature = "macos_15_4_0")] 15_4_0 "15.4.0";
+    ES_TCC_AUTHORIZATION_RIGHT_DENIED = 0,
+    ES_TCC_AUTHORIZATION_RIGHT_UNKNOWN = 1,
+    ES_TCC_AUTHORIZATION_RIGHT_ALLOWED = 2,
+    ES_TCC_AUTHORIZATION_RIGHT_LIMITED = 3,
+    ES_TCC_AUTHORIZATION_RIGHT_ADD_MODIFY_ADDED = 4,
+    ES_TCC_AUTHORIZATION_RIGHT_SESSION_PID = 5,
+    --
+    ES_TCC_AUTHORIZATION_RIGHT_LEARN_MORE = 6,
+);
+
+#[cfg(feature = "macos_15_4_0")]
+ffi_wrap_enum!(
+    /// Represents the reason a TCC permission was updated.
+    es_tcc_authorization_reason_t(u32);
+
+    == #[cfg(feature = "macos_15_4_0")] 15_4_0 "15.4.0";
+    ES_TCC_AUTHORIZATION_REASON_NONE = 0,
+    ES_TCC_AUTHORIZATION_REASON_ERROR = 1,
+    /// User answered a prompt
+    ES_TCC_AUTHORIZATION_REASON_USER_CONSENT = 2,
+    /// User changed the authorization right via Preferences
+    ES_TCC_AUTHORIZATION_REASON_USER_SET = 3,
+    /// A system process changed the authorization right
+    ES_TCC_AUTHORIZATION_REASON_SYSTEM_SET = 4,
+    ES_TCC_AUTHORIZATION_REASON_SERVICE_POLICY = 5,
+    ES_TCC_AUTHORIZATION_REASON_MDM_POLICY = 6,
+    ES_TCC_AUTHORIZATION_REASON_SERVICE_OVERRIDE_POLICY = 7,
+    ES_TCC_AUTHORIZATION_REASON_MISSING_USAGE_STRING = 8,
+    ES_TCC_AUTHORIZATION_REASON_PROMPT_TIMEOUT = 9,
+    ES_TCC_AUTHORIZATION_REASON_PREFLIGHT_UNKNOWN = 10,
+    ES_TCC_AUTHORIZATION_REASON_ENTITLED = 11,
+    ES_TCC_AUTHORIZATION_REASON_APP_TYPE_POLICY = 12,
+    --
+    ES_TCC_AUTHORIZATION_REASON_PROMPT_CANCEL = 13,
+);
+
+#[cfg(feature = "macos_15_4_0")]
+ffi_wrap_enum!(
+    /// Represent the identity type of an application which has access to a TCC
+    /// service.
+    es_tcc_identity_type_t(u32);
+
+    == #[cfg(feature = "macos_15_4_0")] 15_4_0 "15.4.0";
+    ES_TCC_IDENTITY_TYPE_BUNDLE_ID = 0,
+    ES_TCC_IDENTITY_TYPE_EXECUTABLE_PATH = 1,
+    ES_TCC_IDENTITY_TYPE_POLICY_ID = 2,
+    --
+    ES_TCC_IDENTITY_TYPE_FILE_PROVIDER_DOMAIN_ID = 3,
 );

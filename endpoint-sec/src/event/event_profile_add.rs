@@ -4,7 +4,7 @@ use std::ffi::OsStr;
 
 use endpoint_sec_sys::{es_event_profile_add_t, es_profile_source_t, es_profile_t};
 
-use crate::Process;
+use crate::{AuditToken, Process};
 
 /// Notification for Profiles installed on the system.
 #[doc(alias = "es_event_profile_add_t")]
@@ -18,9 +18,22 @@ pub struct EventProfileAdd<'a> {
 impl<'a> EventProfileAdd<'a> {
     /// Process that instigated the Profile install or update.
     #[inline(always)]
-    pub fn instigator(&self) -> Process<'a> {
+    pub fn instigator(&self) -> Option<Process<'a>> {
         // Safety: 'a tied to self, object obtained through ES
-        Process::new(unsafe { self.raw.instigator.as_ref() }, self.version)
+        let process = unsafe { self.raw.instigator()? };
+        Some(Process::new(process, self.version))
+    }
+
+    /// Audit token of the process that instigated this event.
+    pub fn instigator_token(&self) -> AuditToken {
+        #[cfg(feature = "macos_15_0_0")]
+        if self.version >= 8 {
+            return AuditToken(self.raw.instigator_token);
+        }
+
+        // On old versions, the process was always non-null, and we can get
+        // its token easily.
+        self.instigator().unwrap().audit_token()
     }
 
     /// `true` if the event is an update to an already installed profile.
@@ -44,7 +57,7 @@ unsafe impl Send for EventProfileAdd<'_> {}
 // Safety: safe to share across threads: does not contain any interior mutability nor depend on current thread state
 unsafe impl Sync for EventProfileAdd<'_> {}
 
-impl_debug_eq_hash_with_functions!(EventProfileAdd<'a> with version; instigator, is_update, profile);
+impl_debug_eq_hash_with_functions!(EventProfileAdd<'a> with version; instigator, instigator_token, is_update, profile);
 
 /// Structure describing a Profile event
 #[doc(alias = "es_profile_t")]

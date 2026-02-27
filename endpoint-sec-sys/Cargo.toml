@@ -19,8 +19,10 @@ readme = "../README.md"
 default = []
 
 # Updated to the maximum version each time a new one is introduced
-max = ["macos_14_0_0"]
+max = ["macos_15_4_0"]
 
+macos_15_4_0 = ["macos_15_0_0"]
+macos_15_0_0 = ["macos_14_0_0"]
 macos_14_0_0 = ["macos_13_3_0"]
 macos_13_3_0 = ["macos_13_0_0"]
 macos_13_0_0 = ["macos_12_0_0"]
@@ -35,6 +37,7 @@ block2.workspace = true
 libc.workspace = true
 mach2.workspace = true
 objc2.workspace = true
+paste.workspace = true
 
 [package.metadata.docs.rs]
 features = ["max"]
