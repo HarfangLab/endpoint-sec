@@ -12,7 +12,3 @@ error[E0521]: borrowed data escapes outside of closure
    |         |
    |         `client` escapes the closure body here
    |         argument requires that `'1` must outlive `'static`
-   |
-   = note: requirement occurs because of the type `RefCell<Option<Client<'_>>>`, which makes the generic argument `Option<Client<'_>>` invariant
-   = note: the struct `RefCell<T>` is invariant over the parameter `T`
-   = help: see <https://doc.rust-lang.org/nomicon/subtyping.html> for more information about variance
