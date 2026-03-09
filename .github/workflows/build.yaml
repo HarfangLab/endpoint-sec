@@ -32,6 +32,7 @@ jobs:
           - macos_10_15_4
           - macos_10_15_1
           - default
+          - objc2
 
     steps:
       - name: checkout sources

@@ -10,6 +10,7 @@ pub use block2;
 use block2::Block;
 use libc::c_char;
 pub use libc::c_void;
+#[cfg(feature = "objc2")]
 use objc2::{Encoding, RefEncode};
 
 use super::{
@@ -27,6 +28,7 @@ use super::{es_mute_path_type_t, es_muted_paths_t, es_muted_processes_t};
 #[repr(transparent)]
 pub struct es_client_t(u8, PhantomData<*mut u8>);
 
+#[cfg(feature = "objc2")]
 unsafe impl RefEncode for es_client_t {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Encoding::Unknown);
 }

@@ -15,7 +15,7 @@ resolver = "2"
 endpoint-sec = { version = "0.4.0", path = "./endpoint-sec" }
 endpoint-sec-sys = { version = "0.4.0", path = "./endpoint-sec-sys" }
 
-# External - Required
+# External - For libs
 block2 = "0.6"
 libc = { version = "0.2", features = ["extra_traits"] }
 mach2 = "0.5"
