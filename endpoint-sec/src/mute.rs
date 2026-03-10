@@ -18,6 +18,7 @@ pub struct MutedPath {
     pub path: OsString,
 }
 
+#[cfg(feature = "static_assertions")]
 static_assertions::assert_impl_all!(MutedPath: Send);
 
 /// See [`endpoint_sec_sys::es_muted_process_t`]
@@ -30,4 +31,5 @@ pub struct MutedProcess {
     pub events: Vec<es_event_type_t>,
 }
 
+#[cfg(feature = "static_assertions")]
 static_assertions::assert_impl_all!(MutedProcess: Send);

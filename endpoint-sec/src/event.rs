@@ -30,6 +30,7 @@ macro_rules! define_event_enum {
             $( $( #[$v_cfg] $(#[$v_doc])* $v_name($v_inner<'a>), )* )*
         }
 
+        #[cfg(feature = "static_assertions")]
         ::static_assertions::assert_impl_all!(Event<'_>: Send);
 
         impl<'a> $enum_name<'a> {

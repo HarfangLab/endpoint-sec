@@ -33,6 +33,7 @@ pub struct Client<'b> {
     block_lifetime: PhantomData<&'b ()>,
 }
 
+#[cfg(feature = "static_assertions")]
 static_assertions::assert_not_impl_any!(Client: Send, Sync);
 
 /// Helper macro for functions that give us memory we need to free

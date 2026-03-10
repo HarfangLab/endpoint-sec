@@ -12,6 +12,7 @@ pub enum Action {
     Notify(ActionResult),
 }
 
+#[cfg(feature = "static_assertions")]
 static_assertions::assert_impl_all!(Action: Send);
 
 /// Result of the ES subsystem authorization process.
@@ -41,4 +42,5 @@ impl ActionResult {
     }
 }
 
+#[cfg(feature = "static_assertions")]
 static_assertions::assert_impl_all!(ActionResult: Send);
