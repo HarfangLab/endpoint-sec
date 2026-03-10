@@ -600,7 +600,7 @@ extern "C" {
     pub fn es_clear_cache(client: *mut es_client_t) -> es_clear_cache_result_t;
 }
 
-/// The type of block that will be invoked to handled messages from the ES subsystem
+/// The type of block that will be invoked to handle messages from the ES subsystem
 ///
 /// - The `es_client_t` is a handle to the client being sent the event. It must be passed to any
 ///   "respond" functions

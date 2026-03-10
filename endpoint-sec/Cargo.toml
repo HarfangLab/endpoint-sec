@@ -42,7 +42,9 @@ macos_10_15_1 = ["endpoint-sec-sys/macos_10_15_1"]
 [target.'cfg(target_os = "macos")'.dependencies]
 # `objc2` is optional in the sys crate, but critical here: used in `Client::new`.
 endpoint-sec-sys = { workspace = true, features = ["objc2"] }
+# Used in central features such as deadlines and only constitutes basic bindings.
 mach2.workspace = true
+# Used a lot and only constitutes basic bindings.
 libc.workspace = true
 static_assertions = { workspace = true, optional = true }
 

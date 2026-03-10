@@ -35,8 +35,11 @@ macos_10_15_4 = ["macos_10_15_1"]
 macos_10_15_1 = []
 
 [target.'cfg(target_os = "macos")'.dependencies]
+# Strictly required because behind `es_client_new` that is critical.
 block2.workspace = true
+# Used a lot and only constitutes basic bindings.
 libc.workspace = true
+# Same.
 mach2.workspace = true
 objc2 = { workspace = true, optional = true }
 
