@@ -183,6 +183,7 @@ impl AuditToken {
     }
 }
 
+#[cfg(feature = "static_assertions")]
 static_assertions::assert_impl_all!(AuditToken: Send);
 
 impl_debug_eq_hash_with_functions!(

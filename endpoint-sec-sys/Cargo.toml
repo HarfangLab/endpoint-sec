@@ -18,6 +18,10 @@ readme = "../README.md"
 # by default.
 default = []
 
+# Controls if `objc2` is included in dependencies to implement some encoding
+# traits for some exposed types for compatibility with its constraints.
+objc2 = ["dep:objc2"]
+
 # Updated to the maximum version each time a new one is introduced
 max = ["macos_14_0_0"]
 
@@ -31,12 +35,15 @@ macos_10_15_4 = ["macos_10_15_1"]
 macos_10_15_1 = []
 
 [target.'cfg(target_os = "macos")'.dependencies]
+# Strictly required because behind `es_client_new` that is critical.
 block2.workspace = true
+# Used a lot and only constitutes basic bindings.
 libc.workspace = true
+# Same.
 mach2.workspace = true
-objc2.workspace = true
+objc2 = { workspace = true, optional = true }
 
 [package.metadata.docs.rs]
-features = ["max"]
+features = ["max", "objc2"]
 rustdoc-args = ["--cfg", "docsrs", "--generate-link-to-definition"]
 targets = ["x86_64-apple-darwin", "aarch64-apple-darwin"]

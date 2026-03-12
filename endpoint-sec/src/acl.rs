@@ -25,6 +25,7 @@ impl Acl<'_> {
     // in ESMessage.h, there are details to the way it should be done.
 }
 
+#[cfg(feature = "static_assertions")]
 static_assertions::assert_impl_all!(Acl<'_>: Send);
 
 impl_debug_eq_hash_with_functions!(Acl<'a>;);

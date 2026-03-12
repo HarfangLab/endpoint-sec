@@ -15,6 +15,7 @@ pub use libc::{cpu_subtype_t, cpu_type_t};
 pub use libc::{dev_t, gid_t, mode_t, pid_t, stat, statfs, timespec, timeval, uid_t};
 #[cfg(feature = "macos_14_0_0")]
 use mach2::mach_types::uuid_t;
+#[cfg(feature = "objc2")]
 use objc2::{Encoding, RefEncode};
 
 #[cfg(feature = "macos_10_15_4")]
@@ -3138,6 +3139,7 @@ should_not_be_null_fields!(es_message_t; process -> es_process_t);
 #[cfg(feature = "macos_11_0_0")]
 null_fields!(es_message_t; thread -> es_thread_t);
 
+#[cfg(feature = "objc2")]
 unsafe impl RefEncode for es_message_t {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Encoding::Unknown);
 }

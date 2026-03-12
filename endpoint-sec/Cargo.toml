@@ -13,13 +13,17 @@ documentation = "https://docs.rs/endpoint-sec"
 readme = "../README.md"
 
 [features]
-# The default feature activates nothing to ensure developers are aware of what
-# they use. This means this crate supports Endpoint Security from macOS 10.15.0
-# by default.
-default = []
+# The default feature activates the minimum to ensure developers are aware of
+# what they use from the ES API with regards to the runtime version. This means
+# this crate supports Endpoint Security from macOS 10.15.0 by default.
+default = ["static_assertions"]
 
 # Expose `AuditToken::from_pid()`
 audit_token_from_pid = []
+
+# Controls if `static_assertions` is included in dependencies, gating some
+# compile-time checks.
+static_assertions = ["dep:static_assertions"]
 
 # Updated to the maximum version each time a new one is introduced
 #
@@ -36,17 +40,19 @@ macos_10_15_4 = ["macos_10_15_1", "endpoint-sec-sys/macos_10_15_4"]
 macos_10_15_1 = ["endpoint-sec-sys/macos_10_15_1"]
 
 [target.'cfg(target_os = "macos")'.dependencies]
-endpoint-sec-sys.workspace = true
+# `objc2` is optional in the sys crate, but critical here: used in `Client::new`.
+endpoint-sec-sys = { workspace = true, features = ["objc2"] }
+# Used in central features such as deadlines and only constitutes basic bindings.
 mach2.workspace = true
+# Used a lot and only constitutes basic bindings.
 libc.workspace = true
-static_assertions.workspace = true
-
+static_assertions = { workspace = true, optional = true }
 
 [target.'cfg(target_os = "macos")'.dev-dependencies]
 sysinfo.workspace = true
 trybuild.workspace = true
 
 [package.metadata.docs.rs]
-features = ["max", "audit_token_from_pid"]
+features = ["max", "audit_token_from_pid", "static_assertions"]
 rustdoc-args = ["--cfg", "docsrs", "--generate-link-to-definition"]
 targets = ["x86_64-apple-darwin", "aarch64-apple-darwin"]
