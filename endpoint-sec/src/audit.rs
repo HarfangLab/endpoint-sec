@@ -6,6 +6,12 @@ use endpoint_sec_sys::{
     au_asid_t, audit_token_t, audit_token_to_asid, audit_token_to_auid, audit_token_to_egid, audit_token_to_euid,
     audit_token_to_pid, audit_token_to_pidversion, audit_token_to_rgid, audit_token_to_ruid, gid_t, pid_t, uid_t,
 };
+#[cfg(feature = "audit_token_from_pid")]
+use libc::c_int;
+#[cfg(feature = "audit_token_from_pid")]
+use mach2::kern_return::kern_return_t;
+#[cfg(feature = "audit_token_from_pid")]
+use mach2::port::mach_port_name_t;
 
 /// A wrapper around an [`audit_token_t`].
 #[derive(Clone, Copy)]
@@ -35,11 +41,11 @@ impl fmt::UpperHex for AuditToken {
 
 /// Endpoint Security wrappers and test helpers
 impl AuditToken {
-    /// Get the [`AuditToken`] for the given pid, if it exists.
+    /// Get the [`AuditToken`] for the given PID, if it exists.
     ///
-    /// Endpoint Security does not currently provide a way to get the audit tokens for already
-    /// processes when first connecting a client, but it is relatively easy to list the PIDs of the
-    /// current processes.
+    /// Endpoint Security does not currently provide a way to get the audit tokens of processes
+    /// already existing when first connecting a client. However, it is relatively easy to list
+    /// the PIDs of the current processes. This function therefore enables to bridge this gap.
     ///
     /// ## Implementation details
     ///
@@ -47,9 +53,10 @@ impl AuditToken {
     /// calls to `task_name_for_pid` and `task_info(_, TASK_AUDIT_TOKEN, _, _)` but the first
     /// function is marked as *obsolete* in the header containing it in macOS's SDK.
     ///
-    /// Other possibilities could be `task_for_pid()` or `task_inspect_for_pid()`. For now the
-    /// current implementation is the most backward compatible. If you find a bug/need us to use a
-    /// more recent method, please signal it.
+    /// Other possibilities could be `task_for_pid()` or `task_inspect_for_pid()`. For now, the
+    /// current implementation is the most backwards and forwards compatible considering
+    /// `task_for_pid()` now concretely requires SIP to be disabled, which thus makes it pretty
+    /// much unusable. If you find a bug/need us to use a more recent method, please signal it.
     ///
     /// [method]: https://developer.apple.com/forums/thread/652363
     #[cfg(feature = "audit_token_from_pid")]
@@ -60,7 +67,7 @@ impl AuditToken {
         // - `task_name` is mutable and of the correct type so the reference is aligned and points
         //   to initialized memory
         // - result is checked below
-        let res = unsafe { mach2::traps::task_for_pid(mach2::traps::mach_task_self(), pid, &mut task_name) };
+        let res = unsafe { task_name_for_pid(mach2::traps::mach_task_self(), pid, &mut task_name) };
         if res != libc::KERN_SUCCESS {
             return None;
         }
@@ -197,6 +204,13 @@ impl_debug_eq_hash_with_functions!(
     asid,
     pidversion,
 );
+
+#[cfg(feature = "audit_token_from_pid")]
+extern "C" {
+    // TODO: Replace with the one from `mach2::traps` when
+    // https://github.com/JohnTitor/mach2/pull/71 is merged and released.
+    fn task_name_for_pid(target_tport: mach_port_name_t, pid: c_int, tn: *mut mach_port_name_t) -> kern_return_t;
+}
 
 #[cfg(test)]
 #[cfg(feature = "audit_token_from_pid")]
