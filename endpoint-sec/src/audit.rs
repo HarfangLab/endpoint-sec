@@ -239,23 +239,20 @@ extern "C" {
 #[cfg(test)]
 #[cfg(feature = "audit_token_from_pid")]
 mod test {
-    use sysinfo::{Pid, PidExt, ProcessExt, ProcessRefreshKind, System, SystemExt};
+    use sysinfo::{PidExt, ProcessExt, ProcessRefreshKind, RefreshKind, System, SystemExt};
 
     use super::*;
 
     #[test]
     fn audit_token_from_pid() {
-        let raw_pid = std::process::id();
+        let s = System::new_with_specifics(RefreshKind::new().with_processes(ProcessRefreshKind::everything()));
 
-        let mut s = System::new();
-        s.refresh_process_specifics(Pid::from_u32(raw_pid), ProcessRefreshKind::everything());
+        for (pid, process) in s.processes() {
+            let audit_token = AuditToken::from_pid(pid.as_u32() as pid_t).unwrap();
 
-        let process = s.process(Pid::from_u32(raw_pid)).unwrap();
-
-        let audit = AuditToken::from_pid(raw_pid as i32).unwrap();
-
-        assert_eq!(process.user_id().map_or(0, |x| **x), audit.euid());
-        assert_eq!(process.group_id().map_or(0, |x| *x), audit.egid());
-        assert_eq!(process.pid().as_u32(), audit.pid() as u32);
+            assert_eq!(process.user_id().map_or(0, |x| **x), audit_token.euid());
+            assert_eq!(process.group_id().map_or(0, |x| *x), audit_token.egid());
+            assert_eq!(process.pid().as_u32(), audit_token.pid() as u32);
+        }
     }
 }
