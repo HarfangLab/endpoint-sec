@@ -47,6 +47,11 @@ impl AuditToken {
     /// already existing when first connecting a client. However, it is relatively easy to list
     /// the PIDs of the current processes. This function therefore enables to bridge this gap.
     ///
+    /// Errors from the underlying system calls are returned directly. Although it is almost
+    /// certain that only the catch-all `KERN_FAILURE` (5) will ever be observed in practice, this
+    /// should still be useful in order to emphasize that the unexpected case should be accounted
+    /// for instead of just discarded, for example to then log.
+    ///
     /// ## Implementation details
     ///
     /// Currently this method is implemented following the method [described here][method], with
@@ -60,7 +65,7 @@ impl AuditToken {
     ///
     /// [method]: https://developer.apple.com/forums/thread/652363
     #[cfg(feature = "audit_token_from_pid")]
-    pub fn from_pid(pid: pid_t) -> Option<Self> {
+    pub fn from_pid(pid: pid_t) -> Result<Self, kern_return_t> {
         let mut task_name = Default::default();
         // Safety:
         // - `mach_task_self` will always succeed
@@ -69,7 +74,7 @@ impl AuditToken {
         // - result is checked below
         let res = unsafe { task_name_for_pid(mach2::traps::mach_task_self(), pid, &mut task_name) };
         if res != libc::KERN_SUCCESS {
-            return None;
+            return Err(res);
         }
 
         let mut audit_token = audit_token_t::default();
@@ -90,10 +95,10 @@ impl AuditToken {
             )
         };
         if res != libc::KERN_SUCCESS {
-            return None;
+            return Err(res);
         }
 
-        Some(Self(audit_token))
+        Ok(Self(audit_token))
     }
 
     /// Raw underlying audit token.
