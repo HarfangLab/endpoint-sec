@@ -1,17 +1,21 @@
 //! Expose a wrapper around [`audit_token_t`]: [`AuditToken`]
 
 use std::fmt;
+#[cfg(feature = "audit_token_from_pid")]
+use std::mem;
 
 use endpoint_sec_sys::{
     au_asid_t, audit_token_t, audit_token_to_asid, audit_token_to_auid, audit_token_to_egid, audit_token_to_euid,
     audit_token_to_pid, audit_token_to_pidversion, audit_token_to_rgid, audit_token_to_ruid, gid_t, pid_t, uid_t,
 };
 #[cfg(feature = "audit_token_from_pid")]
-use libc::c_int;
+use libc::{c_int, KERN_SUCCESS};
 #[cfg(feature = "audit_token_from_pid")]
 use mach2::kern_return::kern_return_t;
 #[cfg(feature = "audit_token_from_pid")]
 use mach2::port::mach_port_name_t;
+#[cfg(feature = "audit_token_from_pid")]
+use mach2::task_info::TASK_AUDIT_TOKEN;
 
 /// A wrapper around an [`audit_token_t`].
 #[derive(Clone, Copy)]
@@ -66,39 +70,7 @@ impl AuditToken {
     /// [method]: https://developer.apple.com/forums/thread/652363
     #[cfg(feature = "audit_token_from_pid")]
     pub fn from_pid(pid: pid_t) -> Result<Self, kern_return_t> {
-        let mut task_name = Default::default();
-        // Safety:
-        // - `mach_task_self` will always succeed
-        // - `task_name` is mutable and of the correct type so the reference is aligned and points
-        //   to initialized memory
-        // - result is checked below
-        let res = unsafe { task_name_for_pid(mach2::traps::mach_task_self(), pid, &mut task_name) };
-        if res != libc::KERN_SUCCESS {
-            return Err(res);
-        }
-
-        let mut audit_token = audit_token_t::default();
-        // Capacity in bytes of the array in `audit_token`
-        let mut cap = std::mem::size_of_val(&audit_token.val) as u32;
-        // Safety:
-        // - `task_name` is initialized
-        // - `audit_token` is mutable and of the correct type so the reference is aligned and points
-        //   to initialized memory, its type is in sync with `TASK_AUDIT_TOKEN` and `cap` is the
-        //   capacity in bytes
-        // - result is checked below
-        let res = unsafe {
-            libc::task_info(
-                task_name,
-                mach2::task_info::TASK_AUDIT_TOKEN,
-                audit_token.val.as_mut_ptr().cast(),
-                &mut cap,
-            )
-        };
-        if res != libc::KERN_SUCCESS {
-            return Err(res);
-        }
-
-        Ok(Self(audit_token))
+        Ok(Self(mach_task_audit_token(mach_task_name(pid)?)?))
     }
 
     /// Raw underlying audit token.
@@ -209,6 +181,53 @@ impl_debug_eq_hash_with_functions!(
     asid,
     pidversion,
 );
+
+/// Safe wrapper around [`task_name_for_pid`].
+#[cfg(feature = "audit_token_from_pid")]
+fn mach_task_name(pid: pid_t) -> Result<mach_port_name_t, kern_return_t> {
+    let mut task_name = mach_port_name_t::default();
+
+    // SAFETY:
+    //  * `mach_task_self` is always safe to call: resolves a static variable;
+    //  * `task_name` is mutable and of the correct type so the reference is
+    //    aligned and points to initialized memory;
+    //  * errors are checked for below;
+    let res = unsafe { task_name_for_pid(mach2::traps::mach_task_self(), pid, &mut task_name) };
+
+    if res == KERN_SUCCESS {
+        Ok(task_name)
+    } else {
+        Err(res)
+    }
+}
+
+/// Safe wrapper around [`libc::task_info`] specialized for [`TASK_AUDIT_TOKEN`].
+#[cfg(feature = "audit_token_from_pid")]
+fn mach_task_audit_token(task_name: mach_port_name_t) -> Result<audit_token_t, kern_return_t> {
+    let mut audit_token = audit_token_t::default();
+    let mut audit_token_size = mem::size_of_val(&audit_token.val) as u32;
+
+    // SAFETY:
+    //  * `task_name` is initialized;
+    //  * `audit_token` is mutable and of the correct type so the reference
+    //    is aligned and points to initialized memory, its type is in sync
+    //    with `TASK_AUDIT_TOKEN` and `audit_token_size` is its size in bytes;
+    //  * errors are checked for below;
+    let res = unsafe {
+        libc::task_info(
+            task_name,
+            TASK_AUDIT_TOKEN,
+            audit_token.val.as_mut_ptr().cast(),
+            &mut audit_token_size,
+        )
+    };
+
+    if res == KERN_SUCCESS {
+        Ok(audit_token)
+    } else {
+        Err(res)
+    }
+}
 
 #[cfg(feature = "audit_token_from_pid")]
 extern "C" {
