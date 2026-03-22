@@ -196,6 +196,42 @@ jobs:
             --target aarch64-apple-darwin \
             --features ${{ matrix.os.feature }}
 
+  partial-tests:
+    name: Run some of the tests on macOS-latest
+    runs-on: macos-latest
+
+    steps:
+      - name: checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Cache cargo output
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: stable-all_features
+
+      - name: Fetch dependencies
+        run: cargo +stable fetch --locked
+
+      - name: Install cargo-nextest
+        run: curl -LsSf https://get.nexte.st/latest/mac | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+
+      - name: Update PATH
+        run: export PATH=$HOME/.cargo/bin:$PATH
+
+      - name: Build all the tests
+        run: cargo nextest run --no-run --verbose --locked --offline --all-features
+
+      - name: Add entitlements to all test binaries
+        run: find target/debug/deps -perm +111 -type f | grep -v '\.dylib$' | xargs -I '{}' codesign -s - --entitlements endpoint-sec/Entitlement.plist --force {}
+
+      - name: Run the desired tests
+        run: sudo cargo nextest run --verbose --locked --offline --all-features audit_token_from_pid
+
   fmt:
     name: Formatting
     runs-on: ubuntu-latest
