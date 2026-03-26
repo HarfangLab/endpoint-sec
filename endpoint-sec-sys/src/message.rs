@@ -3152,7 +3152,7 @@ pub union es_message_t_anon_0 {
 }
 
 #[link(name = "EndpointSecurity", kind = "dylib")]
-extern "C" {
+unsafe extern "C" {
     /// Calculate the size of an [`es_message_t`].
     ///
     /// This function **MUST NOT** be used in conjunction with attempting to copy an `es_message_t`

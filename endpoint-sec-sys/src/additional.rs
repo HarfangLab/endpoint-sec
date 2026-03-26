@@ -105,7 +105,7 @@ pub struct attrlist {
 }
 
 #[link(name = "bsm", kind = "dylib")]
-extern "C" {
+unsafe extern "C" {
     /// Extract information from an [`audit_token_t`], used to identify Mach tasks and senders
     /// of Mach messages as subjects to the audit system. `audit_tokent_to_au32()` is the only
     /// method that should be used to parse an `audit_token_t`, since its internal representation
