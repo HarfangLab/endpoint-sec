@@ -26,7 +26,7 @@
 //! [esf]: https://developer.apple.com/documentation/endpointsecurity
 
 #![cfg(target_os = "macos")]
-#![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![allow(
     deref_nullptr,
     non_camel_case_types,
