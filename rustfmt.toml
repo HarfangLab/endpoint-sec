@@ -1,6 +1,6 @@
 # Needs rustfmt-nightly
 
-edition = "2021"
+edition = "2024"
 fn_call_width = 60
 format_macro_matchers = true
 group_imports = "StdExternalCrate"
