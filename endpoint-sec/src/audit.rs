@@ -222,7 +222,7 @@ fn mach_task_audit_token(task_name: mach_port_name_t) -> Result<audit_token_t, k
 }
 
 #[cfg(feature = "audit_token_from_pid")]
-extern "C" {
+unsafe extern "C" {
     // TODO: Replace with the one from `mach2::traps` when
     // https://github.com/JohnTitor/mach2/pull/71 is merged and released.
     fn task_name_for_pid(target_tport: mach_port_name_t, pid: c_int, tn: *mut mach_port_name_t) -> kern_return_t;
