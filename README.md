@@ -12,7 +12,9 @@ This repository is composed of two Rust crates:
 
 ## MSRV
 
-Current MSRV is 1.76.0. It can be updated in any minor version, though we'll try to be conservative with it.
+The current MSRV is 1.85.0. It can be updated in any minor version, though
+we'll try to be conservative with it. Typically, we'll try to keep it at least
+10 versions behind the current stable release.
 
 ## Contributing
 
