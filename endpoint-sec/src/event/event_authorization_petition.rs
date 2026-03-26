@@ -90,7 +90,10 @@ impl_debug_eq_hash_with_functions!(EventAuthorizationPetition<'a> with version; 
 ///
 /// Must be called with a valid event for which `idx` is in range `0..raw.right_count`
 unsafe fn read_nth_right(raw: &es_event_authorization_petition_t, idx: usize) -> es_string_token_t {
-    std::ptr::read(raw.rights.add(idx))
+    // SAFETY:
+    //  * upheld by the caller for the index;
+    //  * `raw.rights` is given to us by ES, so adding to it preserves alignment;
+    unsafe { std::ptr::read(raw.rights.add(idx)) }
 }
 
 make_event_data_iterator!(
