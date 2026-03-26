@@ -20,12 +20,12 @@ use objc2::{Encoding, RefEncode};
 
 #[cfg(feature = "macos_10_15_4")]
 use super::es_proc_check_type_t;
+use super::{
+    ShouldNotBeNull, attrlist, audit_token_t, es_action_type_t, es_auth_result_t, es_event_id_t, es_event_type_t,
+    es_result_type_t, es_string_token_t, es_token_t, user_addr_t, user_size_t,
+};
 #[cfg(feature = "macos_10_15_1")]
 use super::{acl_t, es_set_or_clear_t};
-use super::{
-    attrlist, audit_token_t, es_action_type_t, es_auth_result_t, es_event_id_t, es_event_type_t, es_result_type_t,
-    es_string_token_t, es_token_t, user_addr_t, user_size_t, ShouldNotBeNull,
-};
 #[cfg(feature = "macos_13_0_0")]
 use super::{es_address_type_t, es_authentication_type_t};
 #[cfg(feature = "macos_14_0_0")]

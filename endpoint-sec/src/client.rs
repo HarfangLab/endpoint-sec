@@ -4,7 +4,7 @@ use std::ffi::OsStr;
 use std::ffi::OsString;
 use std::marker::PhantomData;
 use std::os::unix::prelude::OsStrExt;
-use std::panic::{catch_unwind, RefUnwindSafe};
+use std::panic::{RefUnwindSafe, catch_unwind};
 use std::ptr::NonNull;
 
 use endpoint_sec_sys::*;
