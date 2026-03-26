@@ -8,7 +8,7 @@ use std::time::{Instant, SystemTime};
 
 use endpoint_sec_sys::*;
 
-use crate::{utils, Action, ActionResult, AuditToken, Event};
+use crate::{Action, ActionResult, AuditToken, Event, utils};
 
 /// A message from Endpoint Security.
 ///

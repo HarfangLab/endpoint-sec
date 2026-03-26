@@ -120,7 +120,10 @@ impl_debug_eq_hash_with_functions!(EventSu<'a>; success, failure_message, from_u
 ///
 /// Must be called with a valid event for which `idx` is in range `0..raw.argc`
 unsafe fn read_nth_arg(raw: &es_event_su_t, idx: usize) -> es_string_token_t {
-    std::ptr::read(raw.argv.add(idx))
+    // SAFETY:
+    //  * upheld by the caller for the index;
+    //  * `raw.argv` is given to us by ES, so adding to it preserves alignment;
+    unsafe { std::ptr::read(raw.argv.add(idx)) }
 }
 
 /// Read the `idx` env of `raw`
@@ -129,7 +132,10 @@ unsafe fn read_nth_arg(raw: &es_event_su_t, idx: usize) -> es_string_token_t {
 ///
 /// Must be called with a valid event for which `idx` is in range `0..raw.env_count`
 unsafe fn read_nth_env(raw: &es_event_su_t, idx: usize) -> es_string_token_t {
-    std::ptr::read(raw.env.add(idx))
+    // SAFETY:
+    //  * upheld by the caller for the index;
+    //  * `raw.env` is given to us by ES, so adding to it preserves alignment;
+    unsafe { std::ptr::read(raw.env.add(idx)) }
 }
 
 make_event_data_iterator!(

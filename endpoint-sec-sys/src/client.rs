@@ -34,7 +34,7 @@ unsafe impl RefEncode for es_client_t {
 }
 
 #[link(name = "EndpointSecurity", kind = "dylib")]
-extern "C" {
+unsafe extern "C" {
     /// Subscribe to some set of events
     ///
     /// - `client`: The client that will be subscribing
@@ -609,7 +609,7 @@ extern "C" {
 pub type es_handler_block_t<'f> = Block<dyn Fn(NonNull<es_client_t>, NonNull<es_message_t>) + 'f>;
 
 #[link(name = "EndpointSecurity", kind = "dylib")]
-extern "C" {
+unsafe extern "C" {
     /// Initialise a new `es_client_t` and connect to the ES subsystem
     ///
     /// - `client`: Out param. On success this will be set to point to the newly allocated [`es_client_t`].

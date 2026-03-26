@@ -470,7 +470,8 @@ impl es_string_token_t {
     /// See [`Self::as_os_str()`].
     #[inline]
     pub unsafe fn as_opt_os_str(&self) -> Option<&OsStr> {
-        let s = self.as_os_str();
+        // SAFETY: upheld by the caller.
+        let s = unsafe { self.as_os_str() };
         (s.is_empty() == false).then_some(s)
     }
 }
