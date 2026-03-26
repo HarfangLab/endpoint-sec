@@ -83,6 +83,7 @@ impl<'a> AuthorizationResult<'a> {
     pub fn rule_class(&self) -> es_authorization_rule_class_t {
         self.raw.rule_class
     }
+
     /// Indicates if the right was granted or not
     #[inline(always)]
     pub fn granted(&self) -> bool {
