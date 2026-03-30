@@ -231,42 +231,49 @@ unsafe extern "C" {
 #[cfg(test)]
 #[cfg(feature = "audit_token_from_pid")]
 mod test {
-    use sysinfo::{PidExt, ProcessExt, ProcessRefreshKind, RefreshKind, System, SystemExt};
+    use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, UpdateKind};
 
     use super::*;
 
     #[test]
     fn audit_token_from_pid() {
-        let proc_refr_kind = ProcessRefreshKind::new().with_user();
-        let mut s = System::new_with_specifics(RefreshKind::new().with_processes(proc_refr_kind));
+        let proc_refr_kind = ProcessRefreshKind::nothing().with_user(UpdateKind::OnlyIfNotSet);
+        let mut s = System::new_with_specifics(RefreshKind::nothing().with_processes(proc_refr_kind));
 
         // Pre-collect in order to allow for mutable borrows in the loop.
         // `Process` is not clonable, so gather its data ahead of time...
-        for (pid, proc_uid, proc_gid) in s
+        for (pid, proc_euid, proc_egid) in s
             .processes()
             .iter()
             .map(|(pid, proc)| {
                 (
                     *pid,
-                    proc.user_id().map_or(0, |x| **x),
-                    proc.group_id().map_or(0, |x| *x),
+                    proc.effective_user_id().map_or(0, |x| **x),
+                    proc.effective_group_id().map_or(0, |x| *x),
                 )
             })
             .collect::<Vec<_>>()
         {
             let audit_token = match AuditToken::from_pid(pid.as_u32() as pid_t) {
                 Ok(at) => at,
-                // The error is not filterable and can simply be due to the
-                // process having exited since, so check for that before panicking.
-                Err(err) if s.refresh_process_specifics(pid, proc_refr_kind) => panic!(
-                    "`AuditToken::from_pid({})` failed while the process is still alive: {:?}",
-                    pid, err,
-                ),
-                Err(_) => continue,
+                Err(err) => {
+                    // The error is not filterable and can simply be due to the
+                    // process having exited since, so check for that before panicking.
+                    s.refresh_processes_specifics(ProcessesToUpdate::Some(&[pid]), true, proc_refr_kind);
+
+                    if s.process(pid).is_some() {
+                        panic!(
+                            "`AuditToken::from_pid({})` failed while the process is still alive: {:?}",
+                            pid, err,
+                        )
+                    } else {
+                        continue;
+                    }
+                },
             };
 
-            assert_eq!(proc_uid, audit_token.euid());
-            assert_eq!(proc_gid, audit_token.egid());
+            assert_eq!(proc_euid, audit_token.euid());
+            assert_eq!(proc_egid, audit_token.egid());
             assert_eq!(pid.as_u32(), audit_token.pid() as u32);
         }
     }
