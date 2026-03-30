@@ -157,7 +157,11 @@ pub enum OdMemberIdArrayIters<'arr, 'raw> {
 /// Must be called with a valid member array for which `idx` is in range `0..raw.member_count` and the
 /// member type is correct.
 unsafe fn read_nth_name(raw: &es_od_member_id_array_t, idx: usize) -> es_string_token_t {
-    std::ptr::read(raw.member_array.names.as_ptr().add(idx))
+    // SAFETY:
+    //  * upheld by the caller for the index;
+    //  * also for the union access;
+    //  * `raw.member_array.names` is given to us by ES, so adding to it preserves alignment;
+    unsafe { std::ptr::read(raw.member_array.names.as_ptr().add(idx)) }
 }
 
 make_event_data_iterator!(
@@ -176,7 +180,11 @@ make_event_data_iterator!(
 /// Must be called with a valid member array for which `idx` is in range `0..raw.member_count` and the
 /// member type is correct.
 unsafe fn read_nth_uuid(raw: &es_od_member_id_array_t, idx: usize) -> libc::uuid_t {
-    std::ptr::read(raw.member_array.uuids.as_ptr().add(idx))
+    // SAFETY:
+    //  * upheld by the caller for the index;
+    //  * also for the union access;
+    //  * `raw.member_array.uuids` is given to us by ES, so adding to it preserves alignment;
+    unsafe { std::ptr::read(raw.member_array.uuids.as_ptr().add(idx)) }
 }
 
 make_event_data_iterator!(

@@ -108,6 +108,7 @@ impl<'a> AuthorizationResult<'a> {
     pub fn rule_class(&self) -> es_authorization_rule_class_t {
         self.raw.rule_class
     }
+
     /// Indicates if the right was granted or not
     #[inline(always)]
     pub fn granted(&self) -> bool {
@@ -126,7 +127,10 @@ impl_debug_eq_hash_with_functions!(AuthorizationResult<'a>; right_name, rule_cla
 ///
 /// Must be called with a valid event for which `idx` is in range `0..raw.result_count`
 unsafe fn read_nth_result(raw: &es_event_authorization_judgement_t, idx: usize) -> *const es_authorization_result_t {
-    raw.results.add(idx).cast_const()
+    // SAFETY:
+    //  * upheld by the caller for the index;
+    //  * `raw.results` is given to us by ES, so adding to it preserves alignment;
+    unsafe { raw.results.add(idx).cast_const() }
 }
 
 /// See [`super::as_os_str()`] for lifetime and safety docs

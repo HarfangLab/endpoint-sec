@@ -9,7 +9,7 @@ use endpoint_sec_sys::{
     audit_token_to_pid, audit_token_to_pidversion, audit_token_to_rgid, audit_token_to_ruid, gid_t, pid_t, uid_t,
 };
 #[cfg(feature = "audit_token_from_pid")]
-use libc::{c_int, KERN_SUCCESS};
+use libc::{KERN_SUCCESS, c_int};
 #[cfg(feature = "audit_token_from_pid")]
 use mach2::kern_return::kern_return_t;
 #[cfg(feature = "audit_token_from_pid")]
@@ -194,11 +194,7 @@ fn mach_task_name(pid: pid_t) -> Result<mach_port_name_t, kern_return_t> {
     //  * errors are checked for below;
     let res = unsafe { task_name_for_pid(mach2::traps::mach_task_self(), pid, &mut task_name) };
 
-    if res == KERN_SUCCESS {
-        Ok(task_name)
-    } else {
-        Err(res)
-    }
+    if res == KERN_SUCCESS { Ok(task_name) } else { Err(res) }
 }
 
 /// Safe wrapper around [`libc::task_info`] specialized for [`TASK_AUDIT_TOKEN`].
@@ -222,15 +218,11 @@ fn mach_task_audit_token(task_name: mach_port_name_t) -> Result<audit_token_t, k
         )
     };
 
-    if res == KERN_SUCCESS {
-        Ok(audit_token)
-    } else {
-        Err(res)
-    }
+    if res == KERN_SUCCESS { Ok(audit_token) } else { Err(res) }
 }
 
 #[cfg(feature = "audit_token_from_pid")]
-extern "C" {
+unsafe extern "C" {
     // TODO: Replace with the one from `mach2::traps` when
     // https://github.com/JohnTitor/mach2/pull/71 is merged and released.
     fn task_name_for_pid(target_tport: mach_port_name_t, pid: c_int, tn: *mut mach_port_name_t) -> kern_return_t;

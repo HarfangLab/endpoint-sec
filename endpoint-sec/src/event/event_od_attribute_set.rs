@@ -115,7 +115,10 @@ impl_debug_eq_hash_with_functions!(EventOdAttributeSet<'a> with version; instiga
 ///
 /// Must be called with a valid event for which `idx` is in range `0..raw.attribute_value_count`
 unsafe fn read_nth_attribute_value(raw: &es_event_od_attribute_set_t, idx: usize) -> es_string_token_t {
-    std::ptr::read(raw.attribute_value_array.add(idx))
+    // SAFETY:
+    //  * upheld by the caller for the index;
+    //  * `raw.attribute_value_array` is given to us by ES, so adding to it preserves alignment;
+    unsafe { std::ptr::read(raw.attribute_value_array.add(idx)) }
 }
 
 make_event_data_iterator!(
