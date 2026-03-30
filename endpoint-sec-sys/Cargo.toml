@@ -23,8 +23,10 @@ default = []
 objc2 = ["dep:objc2"]
 
 # Updated to the maximum version each time a new one is introduced
-max = ["macos_14_0_0"]
+max = ["macos_15_4_0"]
 
+macos_15_4_0 = ["macos_15_0_0"]
+macos_15_0_0 = ["macos_14_0_0"]
 macos_14_0_0 = ["macos_13_3_0"]
 macos_13_3_0 = ["macos_13_0_0"]
 macos_13_0_0 = ["macos_12_0_0"]
