@@ -237,14 +237,37 @@ mod test {
 
     #[test]
     fn audit_token_from_pid() {
-        let s = System::new_with_specifics(RefreshKind::new().with_processes(ProcessRefreshKind::everything()));
+        let proc_refr_kind = ProcessRefreshKind::new().with_user();
+        let mut s = System::new_with_specifics(RefreshKind::new().with_processes(proc_refr_kind));
 
-        for (pid, process) in s.processes() {
-            let audit_token = AuditToken::from_pid(pid.as_u32() as pid_t).unwrap();
+        // Pre-collect in order to allow for mutable borrows in the loop.
+        // `Process` is not clonable, so gather its data ahead of time...
+        for (pid, proc_uid, proc_gid) in s
+            .processes()
+            .iter()
+            .map(|(pid, proc)| {
+                (
+                    *pid,
+                    proc.user_id().map_or(0, |x| **x),
+                    proc.group_id().map_or(0, |x| *x),
+                )
+            })
+            .collect::<Vec<_>>()
+        {
+            let audit_token = match AuditToken::from_pid(pid.as_u32() as pid_t) {
+                Ok(at) => at,
+                // The error is not filterable and can simply be due to the
+                // process having exited since, so check for that before panicking.
+                Err(err) if s.refresh_process_specifics(pid, proc_refr_kind) => panic!(
+                    "`AuditToken::from_pid({})` failed while the process is still alive: {:?}",
+                    pid, err,
+                ),
+                Err(_) => continue,
+            };
 
-            assert_eq!(process.user_id().map_or(0, |x| **x), audit_token.euid());
-            assert_eq!(process.group_id().map_or(0, |x| *x), audit_token.egid());
-            assert_eq!(process.pid().as_u32(), audit_token.pid() as u32);
+            assert_eq!(proc_uid, audit_token.euid());
+            assert_eq!(proc_gid, audit_token.egid());
+            assert_eq!(pid.as_u32(), audit_token.pid() as u32);
         }
     }
 }
