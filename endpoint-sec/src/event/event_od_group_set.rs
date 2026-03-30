@@ -141,6 +141,7 @@ unsafe impl Send for OdMemberIdArray<'_> {}
 impl_debug_eq_hash_with_functions!(OdMemberIdArray<'a>; member_type, member_count);
 
 /// One of the possible iterator for [`OdMemberIdArray`]
+#[non_exhaustive]
 pub enum OdMemberIdArrayIters<'arr, 'raw> {
     /// Users, designated by name
     UserName(OdMemberIdArrayNames<'arr, 'raw>),

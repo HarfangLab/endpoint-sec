@@ -85,6 +85,7 @@ impl_debug_eq_hash_with_functions!(EventAuthentication<'a>; success, type_, data
 #[doc(alias = "es_event_authentication_t_anon0")]
 #[doc(alias = "es_authentication_type_t")]
 #[derive(Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum AuthenticationData<'a> {
     /// Wrapped [`es_event_authentication_t_anon_0.od`]
     Od(EventAuthenticationOd<'a>),
