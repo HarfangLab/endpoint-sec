@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
@@ -79,7 +79,7 @@ jobs:
 
     steps:
       - name: checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
@@ -121,7 +121,7 @@ jobs:
 
     steps:
       - name: checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
@@ -171,7 +171,7 @@ jobs:
 
     steps:
       - name: checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
@@ -205,7 +205,7 @@ jobs:
 
     steps:
       - name: checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
@@ -241,7 +241,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -261,7 +261,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
