@@ -16,14 +16,20 @@ pub struct EventRename<'a> {
 /// Represent a destination file for [`EventRename`].
 #[derive(Debug, PartialEq, Eq, Hash)]
 #[doc(alias = "es_destination_type_t")]
+#[non_exhaustive]
 pub enum EventRenameDestinationFile<'a> {
     /// The destination file already exist at the time of the event.
-    ExistingFile(File<'a>),
+    #[non_exhaustive]
+    ExistingFile {
+        /// The file that will be overwritten by the rename operation.
+        file: File<'a>
+    },
     /// The destination doesn't exist at the time of the event.
+    #[non_exhaustive]
     NewPath {
         /// The directory into which the file will be renamed.
         directory: File<'a>,
-        /// The name of the new file that will be created.
+        /// The filename of the destination of the rename operation.
         filename: &'a OsStr,
     },
 }
@@ -42,9 +48,9 @@ impl<'a> EventRename<'a> {
         match self.raw.destination_type {
             es_destination_type_t::ES_DESTINATION_TYPE_EXISTING_FILE => {
                 // Safety: Safe as we select the union field corresponding to that type.
-                Some(EventRenameDestinationFile::ExistingFile(unsafe {
-                    File::new(self.raw.destination.existing_file.as_ref())
-                }))
+                Some(EventRenameDestinationFile::ExistingFile {
+                    file: File::new(unsafe { self.raw.destination.existing_file.as_ref() })
+                })
             },
             es_destination_type_t::ES_DESTINATION_TYPE_NEW_PATH => {
                 // Safety: Safe as we select the union fields corresponding to that type.
