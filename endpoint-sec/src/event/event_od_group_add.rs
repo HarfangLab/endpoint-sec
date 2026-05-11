@@ -141,6 +141,7 @@ impl_debug_eq_hash_with_functions!(OdMemberId<'a>; member_type, member_value);
 
 /// A member identity.
 #[derive(Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum OdMemberIdValue<'a> {
     /// Group member is a user, designated by name
     UserName(&'a OsStr),

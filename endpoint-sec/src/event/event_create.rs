@@ -20,12 +20,18 @@ pub struct EventCreate<'a> {
 /// Represent a destination file for [`EventCreate`].
 #[derive(Debug, PartialEq, Eq, Hash)]
 #[doc(alias = "es_destination_type_t")]
+#[non_exhaustive]
 pub enum EventCreateDestinationFile<'a> {
     /// The destination file already exist at the time of the event.
-    ExistingFile(File<'a>),
+    #[non_exhaustive]
+    ExistingFile {
+        /// The file that will be overwritten by the file creation.
+        file: File<'a>,
+    },
     /// The destination doesn't exist at the time of the event.
+    #[non_exhaustive]
     NewPath {
-        /// The directory into which the file will be renamed.
+        /// The directory into which the file will be created.
         directory: File<'a>,
         /// The name of the new file that will be created.
         filename: &'a OsStr,
@@ -40,10 +46,10 @@ impl<'a> EventCreate<'a> {
     pub fn destination(&self) -> Option<EventCreateDestinationFile<'a>> {
         match self.raw.destination_type {
             es_destination_type_t::ES_DESTINATION_TYPE_EXISTING_FILE => {
-                Some(EventCreateDestinationFile::ExistingFile(
+                Some(EventCreateDestinationFile::ExistingFile {
                     // Safety: Safe as we select the union field corresponding to that type.
-                    File::new(unsafe { self.raw.destination.existing_file.as_ref() }),
-                ))
+                    file: File::new(unsafe { self.raw.destination.existing_file.as_ref() }),
+                })
             },
             es_destination_type_t::ES_DESTINATION_TYPE_NEW_PATH => {
                 // Safety: Safe as we select the union fields corresponding to that type.
