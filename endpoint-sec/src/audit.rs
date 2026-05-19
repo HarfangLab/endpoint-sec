@@ -231,37 +231,27 @@ unsafe extern "C" {
 #[cfg(test)]
 #[cfg(feature = "audit_token_from_pid")]
 mod test {
-    use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, UpdateKind};
+    use std::ffi::{c_char, c_void};
+    use std::mem::MaybeUninit;
+    use std::{io, ptr};
+
+    use libc::{ESRCH, MAXCOMLEN};
 
     use super::*;
 
     #[test]
     fn audit_token_from_pid() {
-        let proc_refr_kind = ProcessRefreshKind::nothing().with_user(UpdateKind::OnlyIfNotSet);
-        let mut s = System::new_with_specifics(RefreshKind::nothing().with_processes(proc_refr_kind));
+        for proc in get_proc_infos().unwrap() {
+            let pid = proc.pbsi_pid;
+            let proc_euid = proc.pbsi_uid;
+            let proc_egid = proc.pbsi_gid;
 
-        // Pre-collect in order to allow for mutable borrows in the loop.
-        // `Process` is not clonable, so gather its data ahead of time...
-        for (pid, proc_euid, proc_egid) in s
-            .processes()
-            .iter()
-            .map(|(pid, proc)| {
-                (
-                    *pid,
-                    proc.effective_user_id().map_or(0, |x| **x),
-                    proc.effective_group_id().map_or(0, |x| *x),
-                )
-            })
-            .collect::<Vec<_>>()
-        {
-            let audit_token = match AuditToken::from_pid(pid.as_u32() as pid_t) {
+            let audit_token = match AuditToken::from_pid(pid as pid_t) {
                 Ok(at) => at,
                 Err(err) => {
                     // The error is not filterable and can simply be due to the
                     // process having exited since, so check for that before panicking.
-                    s.refresh_processes_specifics(ProcessesToUpdate::Some(&[pid]), true, proc_refr_kind);
-
-                    if s.process(pid).is_some() {
+                    if proc_is_alive(pid as pid_t).unwrap() {
                         panic!(
                             "`AuditToken::from_pid({})` failed while the process is still alive: {:?}",
                             pid, err,
@@ -274,7 +264,123 @@ mod test {
 
             assert_eq!(proc_euid, audit_token.euid());
             assert_eq!(proc_egid, audit_token.egid());
-            assert_eq!(pid.as_u32(), audit_token.pid() as u32);
+            assert_eq!(pid, audit_token.pid() as u32);
         }
+    }
+
+    /// A convenience composition of [`get_procs`] and [`get_proc_info`].
+    fn get_proc_infos() -> Result<Vec<proc_bsdshortinfo>, io::Error> {
+        get_procs()?.into_iter().map(get_proc_info).collect()
+    }
+
+    /// Returns the list of the PIDs of the processes currently running.
+    fn get_procs() -> Result<Vec<pid_t>, io::Error> {
+        // SAFETY: giving a null pointer and a zero size returns the process count.
+        let count = unsafe { libc::proc_listallpids(ptr::null_mut(), 0) };
+
+        if count <= 0 {
+            return Err(io::Error::last_os_error());
+        }
+
+        let mut pids = Vec::<pid_t>::with_capacity(count as usize);
+        let ffi_pids = pids.spare_capacity_mut();
+        // SAFETY:
+        //  * the given buffer is correctly allocated for `count` elements;
+        //  * the specified buffer size is consistent with it and its elements;
+        let new_count = unsafe {
+            libc::proc_listallpids(
+                ffi_pids.as_mut_ptr().cast::<c_void>(),
+                (ffi_pids.len() * mem::size_of::<pid_t>()) as i32,
+            )
+        };
+
+        if new_count <= 0 || new_count > count {
+            Err(io::Error::last_os_error())
+        } else {
+            // Set the vector length to what was actually written.
+            // SAFETY: the `new_count` can only be <= to the capacity here.
+            unsafe { pids.set_len(new_count as usize) };
+            Ok(pids)
+        }
+    }
+
+    /// Returns the short BSD info of the process identified by the given PID.
+    fn get_proc_info(pid: pid_t) -> Result<proc_bsdshortinfo, io::Error> {
+        let mut info = MaybeUninit::<proc_bsdshortinfo>::uninit();
+        // SAFETY:
+        //  * the buffer pointer points to an available stack space;
+        //  * the specified buffer size is consistent with it and its elements;
+        //  * the specified info type is consistent with the buffer;
+        let res = unsafe {
+            libc::proc_pidinfo(
+                pid,
+                PROC_PIDT_SHORTBSDINFO,
+                0,
+                ptr::from_mut(&mut info).cast(),
+                mem::size_of::<proc_bsdshortinfo>() as _,
+            )
+        };
+
+        if res != mem::size_of::<proc_bsdshortinfo>() as c_int {
+            Err(io::Error::last_os_error())
+        } else {
+            // SAFETY: the call succeeded at this point.
+            Ok(unsafe { info.assume_init() })
+        }
+    }
+
+    /// Returns `true` if the process identified by the given PID is still alive.
+    fn proc_is_alive(pid: pid_t) -> Result<bool, io::Error> {
+        // A signal of 0 only performs a liveness check.
+        // SAFETY: always safe to call.
+        if unsafe { libc::kill(pid, 0) } == 0 {
+            return Ok(true);
+        }
+
+        // `kill` failed but it might not be because the process is dead.
+        let err = io::Error::last_os_error();
+
+        // If `errno` is equal to `ESCHR`, then it means the process is dead.
+        // UNWRAP: the error was built from `io::Error::last_os_error`.
+        if err.raw_os_error().unwrap() == ESRCH {
+            Ok(false)
+        } else {
+            Err(err)
+        }
+    }
+
+    // TODO: remove when https://github.com/rust-lang/libc/pull/5110 is merged and released.
+
+    const PROC_PIDT_SHORTBSDINFO: c_int = 13;
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[repr(C)]
+    struct proc_bsdshortinfo {
+        /// Process ID.
+        pbsi_pid: u32,
+        /// Process parent ID.
+        pbsi_ppid: u32,
+        /// Process perp ID.
+        pbsi_pgid: u32,
+        /// `p_stat` value: `SZOMB`, `SRUN`, etc.
+        pbsi_status: u32,
+        /// Up to 16 characters of process name.
+        pbsi_comm: [c_char; MAXCOMLEN],
+        /// 64bit, emulated, etc.
+        pbsi_flags: u32,
+        /// Current UID on process.
+        pbsi_uid: uid_t,
+        /// Current GID on process.
+        pbsi_gid: gid_t,
+        /// Current RUID on process.
+        pbsi_ruid: uid_t,
+        /// Current RGID on process.
+        pbsi_rgid: gid_t,
+        /// Current SVUID on process.
+        pbsi_svuid: uid_t,
+        /// Current SVGID on process.
+        pbsi_svgid: gid_t,
+        /// Reserved for future use.
+        pbsi_rfu: u32,
     }
 }
