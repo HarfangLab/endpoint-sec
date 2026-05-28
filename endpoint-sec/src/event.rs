@@ -71,6 +71,7 @@ macro_rules! define_event_enum {
 define_event_enum!(
     /// Information related to an event.
     #[derive(Debug, PartialEq, Eq, Hash)]
+    #[non_exhaustive]
     pub enum Event from (raw_event, version) {
         /// Authorization request for a process execution.
         ES_EVENT_TYPE_AUTH_EXEC => AuthExec(EventExec [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.exec, version, }),
