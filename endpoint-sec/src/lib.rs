@@ -32,8 +32,6 @@
 
 // Reexports [`endpoint_sec_sys`]
 pub use endpoint_sec_sys as sys;
-#[cfg(all(test, not(feature = "audit_token_from_pid")))]
-use sysinfo as _;
 #[cfg(test)]
 use trybuild as _;
 
