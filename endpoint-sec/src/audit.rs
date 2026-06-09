@@ -233,7 +233,8 @@ unsafe extern "C" {
 mod test {
     use std::ffi::{c_char, c_void};
     use std::mem::MaybeUninit;
-    use std::{io, ptr};
+    use std::time::Duration;
+    use std::{io, ptr, thread};
 
     use libc::{ESRCH, MAXCOMLEN};
 
@@ -251,6 +252,11 @@ mod test {
                 Err(err) => {
                     // The error is not filterable and can simply be due to the
                     // process having exited since, so check for that before panicking.
+                    // Wait a bit before doing so to avoid flakiness: it seems to
+                    // work, so could be due to a small race in case the process
+                    // is currently exiting or whatever.
+                    thread::sleep(Duration::from_millis(100));
+
                     if proc_is_alive(pid as pid_t).unwrap() {
                         panic!(
                             "`AuditToken::from_pid({})` failed while the process is still alive: {:?}",
