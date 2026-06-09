@@ -1,6 +1,6 @@
 # Endpoint Security - Rust bindings
 
-[Endpoint Security][es] (abbreviated ES here) is a framework provided by Apple for macOS machines for monitoring system events for potentially malicious activity, see the [official documentation][es] for the exact details.
+[Endpoint Security][es] (abbreviated ES here) is a framework[^1] provided by Apple for macOS machines for monitoring system events for potentially malicious activity, see the [official documentation][es] for the exact details.
 
 This repository is composed of two Rust crates:
 
@@ -9,6 +9,10 @@ This repository is composed of two Rust crates:
 `endpoint-sec` contains the higher level wrappers. They're much safer and more ergonomic to use but incur a slight overhead cost in certain methods (not all, not even most of them).
 
 [es]: https://developer.apple.com/documentation/endpointsecurity
+[^1]: "framework" in the sense of how a client interacts with the runtime and
+      how the Apple documentation refers to it, but the headers used on the
+      client side and the compiler arguments to link with the stuff in question
+      still make it a "library".
 
 ## MSRV
 
