@@ -231,12 +231,12 @@ unsafe extern "C" {
 #[cfg(test)]
 #[cfg(feature = "audit_token_from_pid")]
 mod test {
-    use std::ffi::{c_char, c_void};
+    use std::ffi::c_void;
     use std::mem::MaybeUninit;
     use std::time::Duration;
     use std::{io, ptr, thread};
 
-    use libc::{ESRCH, MAXCOMLEN};
+    use libc::{ESRCH, PROC_PIDT_SHORTBSDINFO, proc_bsdshortinfo};
 
     use super::*;
 
@@ -353,40 +353,5 @@ mod test {
         } else {
             Err(err)
         }
-    }
-
-    // TODO: remove when https://github.com/rust-lang/libc/pull/5110 is merged and released.
-
-    const PROC_PIDT_SHORTBSDINFO: c_int = 13;
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    #[repr(C)]
-    struct proc_bsdshortinfo {
-        /// Process ID.
-        pbsi_pid: u32,
-        /// Process parent ID.
-        pbsi_ppid: u32,
-        /// Process perp ID.
-        pbsi_pgid: u32,
-        /// `p_stat` value: `SZOMB`, `SRUN`, etc.
-        pbsi_status: u32,
-        /// Up to 16 characters of process name.
-        pbsi_comm: [c_char; MAXCOMLEN],
-        /// 64bit, emulated, etc.
-        pbsi_flags: u32,
-        /// Current UID on process.
-        pbsi_uid: uid_t,
-        /// Current GID on process.
-        pbsi_gid: gid_t,
-        /// Current RUID on process.
-        pbsi_ruid: uid_t,
-        /// Current RGID on process.
-        pbsi_rgid: gid_t,
-        /// Current SVUID on process.
-        pbsi_svuid: uid_t,
-        /// Current SVGID on process.
-        pbsi_svgid: gid_t,
-        /// Reserved for future use.
-        pbsi_rfu: u32,
     }
 }
