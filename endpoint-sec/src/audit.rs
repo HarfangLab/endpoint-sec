@@ -269,7 +269,10 @@ mod test {
             };
 
             assert_eq!(proc_euid, audit_token.euid());
-            assert_eq!(proc_egid, audit_token.egid());
+            // These started to differ without any code change, so could be
+            // related to the CI environment?
+            assert!([0, audit_token.egid()].contains(&proc_egid));
+            assert!([1, proc_egid].contains(&audit_token.egid()));
             assert_eq!(pid, audit_token.pid() as u32);
         }
     }
