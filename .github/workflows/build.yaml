@@ -220,6 +220,7 @@ jobs:
       - name: Fetch dependencies
         run: cargo +stable fetch --locked
 
+      - run: mkdir -p ${CARGO_HOME:-~/.cargo}/bin
       - name: Install cargo-nextest
         run: curl -LsSf https://get.nexte.st/latest/mac | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
